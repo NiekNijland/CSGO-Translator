@@ -16,7 +16,6 @@ namespace CsgoTranslator
         public Log(string name, string message)
         {
             this.Name = name;
-            this.Message = "error";
             this.OriginalMessage = message;
         }
 
