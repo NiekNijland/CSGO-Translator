@@ -15,6 +15,8 @@ C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive
 
 100% safe to use on official servers!
 
+![](demo.png)
+
 SETUP:
 1. Download the lastest release (or build it yourself)
 2. run CSGO-Translator.exe
