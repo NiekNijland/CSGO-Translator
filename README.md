@@ -15,7 +15,7 @@ C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive
 
 100% safe to use on official servers!
 
-![](demo.png)
+![](demo.PNG)
 
 SETUP:
 1. Download the lastest release (or build it yourself)
