@@ -1,9 +1,7 @@
 # CSGO-Translator
 Simple C# CSGO chat translator
 
-
 Ever wondered what your foreign language speaking teammates where trying to tell you?
-Well wonder no more, because CSGO-Translator is here.
 
 CSGO-Translator is a C# .NET WPF based tool that will automatically detect new chat messages, and translate them to English using Google Translate.
 
@@ -35,6 +33,6 @@ FEATURES:
 5. Automatically checks for new chats, no need to refresh or anything.
 
 CURRENT LIMITATIONS:
-3. Might get a timeout from Google Translate under extreme use.
-4. Won't display new message when an identical message has been sent recently (to avoid the Google Translate timeout).
-5. Won't display chat messages on certain community servers because of different chat structures.
+1. Might get a timeout from Google Translate under extreme use.
+2. Won't display new message when an identical message has been sent recently (to avoid the Google Translate timeout).
+3. Won't display chat messages on certain community servers because of different chat structures.
