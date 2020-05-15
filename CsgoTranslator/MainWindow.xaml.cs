@@ -70,6 +70,7 @@ namespace CsgoTranslator
         {
             CheckTimer.Stop();
             new OptionsWindow().ShowDialog();
+            this.Logs.Clear();
             CheckTimer.Start();
         }
 
