@@ -12,15 +12,15 @@ namespace CsgoTranslator
         static private List<string> GetLastLines(int amount)
         {
             //check if file exists, if not return null so an error can be displayed
-            if(File.Exists(@"C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\csgo\console.log"))
+            if(File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log"))
             {
                 //copying console.log as console2.log so CSGO Translator can acces it.
-                File.Copy(@"C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\csgo\console.log", @"C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\csgo\console2.log");
+                File.Copy($@"{Properties.Settings.Default.Path}\csgo\console.log", @"C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\csgo\console2.log");
 
                 //TODO: optimize the linereading so that not all lines are retrieved if there are more then 100
 
                 //if file contains atleast a 100 rows, only return the most recent 100
-                var Lines = File.ReadLines("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\\console2.log");
+                var Lines = File.ReadLines($@"{Properties.Settings.Default.Path}\csgo\console2.log");
                 List<string> returnList;
                 if(Lines.Count() <= 100)
                 {
@@ -32,7 +32,7 @@ namespace CsgoTranslator
                 }
 
                 //delete console2.log
-                File.Delete("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\\console2.log");
+                File.Delete($@"{Properties.Settings.Default.Path}\csgo\console2.log");
                 return returnList;
             }
             else

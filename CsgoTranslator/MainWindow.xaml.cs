@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,15 +25,16 @@ namespace CsgoTranslator
     public partial class MainWindow : Window
     {
         public List<Log> Logs { get; set; }
+        private DispatcherTimer CheckTimer = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(3);
-            timer.Tick += UpdateChat;
-            timer.Start();
+            CheckTimer.Interval = TimeSpan.FromSeconds(3);
+            CheckTimer.Tick += UpdateChat;
+            CheckTimer.Start();
             this.Logs = new List<Log>();
             ChatView.ItemsSource = this.Logs;
+            OptionsController.CheckIfSet();
         }
 
         private void UpdateChat(object sender, EventArgs e)
@@ -59,9 +61,22 @@ namespace CsgoTranslator
             }
             else
             {
-                MessageBox.Show(this, "Can't find console.log \nEnter the console command: con_logfile \"console.log\"\nor check csgo install location \n\nClick OK to continue", "CSGO Translator - Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.No);
+                MessageBox.Show(this, "Can't find console.log \nEnter the console command: con_logfile \"console.log\"\nor check csgo path in options window \n\nClick OK to continue", "CSGO Translator - Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.No);
             }
 
+        }
+
+        private void BtnOptions_Click(object sender, RoutedEventArgs e)
+        {
+            CheckTimer.Stop();
+            new OptionsWindow().ShowDialog();
+            CheckTimer.Start();
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

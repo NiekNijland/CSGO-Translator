@@ -1,0 +1,17 @@
+﻿<Window x:Class="CsgoTranslator.OptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CsgoTranslator"
+        mc:Ignorable="d"
+        Title="CSGO-Translator - Options" Height="148.711" Width="664.304">
+    <Grid>
+        <Label Content="Install location:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+        <TextBox x:Name="tbFolderPath" HorizontalAlignment="Left" Height="23" Margin="104,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
+        <Button Content="Save" HorizontalAlignment="Left" Margin="571,88,0,0" VerticalAlignment="Top" Width="75" Click="BtnSaveOptions_Click"/>
+        <Label Content="Language:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,46,0,0"/>
+        <TextBox x:Name="tbLang" HorizontalAlignment="Left" Height="23" Margin="104,49,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542" MaxLength="2"/>
+        <Button Content="Set default" HorizontalAlignment="Left" Margin="470,88,0,0" VerticalAlignment="Top" Width="75" Click="BtnSetDefault_Click"/>
+    </Grid>
+</Window>

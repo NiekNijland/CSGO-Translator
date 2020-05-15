@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CsgoTranslator"
         mc:Ignorable="d"
-        Title="CSGO Translator" Height="430" Width="550" ResizeMode="NoResize">
+        Title="CSGO Translator" Height="441.813" Width="550" ResizeMode="NoResize">
     <Grid>
-        <ListView x:Name="ChatView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="401" Width="544">
+        <ListView x:Name="ChatView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="355" Width="544">
             <ListView.View>
                 <GridView>
                     <GridView.ColumnHeaderContainerStyle>
@@ -20,5 +20,11 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <TextBlock FontSize="22" Margin="10,362,299,10">           
+            <Hyperlink NavigateUri="https://steamcommunity.com/profiles/76561198171831059" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="mad"/><InlineUIContainer>
+                    
+                </InlineUIContainer><Run Text="e by NoekNoeland"/></Hyperlink>
+        </TextBlock>
+        <Button Content="Options" Margin="429,363,10,10" Click="BtnOptions_Click"/>
     </Grid>
 </Window>

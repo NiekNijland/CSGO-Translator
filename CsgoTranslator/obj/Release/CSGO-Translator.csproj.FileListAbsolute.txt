@@ -28,3 +28,5 @@ C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\CS
 C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\CSGO-Translator.csproj.CopyComplete
 C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\CsgoTranslator.exe
 C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\CsgoTranslator.pdb
+C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\OptionsWindow.g.cs
+C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\OptionsWindow.baml
