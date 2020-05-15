@@ -15,7 +15,7 @@ namespace CsgoTranslator
             if(File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log"))
             {
                 //copying console.log as console2.log so CSGO Translator can acces it.
-                File.Copy($@"{Properties.Settings.Default.Path}\csgo\console.log", @"C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\csgo\console2.log");
+                File.Copy($@"{Properties.Settings.Default.Path}\csgo\console.log", $@"{Properties.Settings.Default.Path}\csgo\console2.log");
 
                 //TODO: optimize the linereading so that not all lines are retrieved if there are more then 100
 
