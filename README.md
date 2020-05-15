@@ -12,10 +12,10 @@ It works by reading the console logfile and analysing it for new messages every 
 100% safe to use on official servers!
 
 EXAMPLE OF TRANSLATION:
-![](img\demo.PNG)
+![](img/demo.PNG)
 
 OPTIONS AVAILABLE:
-![](img\demo2.PNG)
+![](img/demo2.PNG)
 
 SETUP:
 1. Download the lastest release (or build it yourself)
