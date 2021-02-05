@@ -12,28 +12,37 @@ namespace CsgoTranslator
         static private List<string> GetLastLines(int amount)
         {
             //check if file exists, if not return null so an error can be displayed
-            if(File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log"))
+            if (File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log"))
             {
-                //copying console.log as console2.log so CSGO Translator can acces it.
-                File.Copy($@"{Properties.Settings.Default.Path}\csgo\console.log", $@"{Properties.Settings.Default.Path}\csgo\console2.log");
+                int count = 0;
+                byte[] buffer = new byte[1];
+                List<string> consoleLines = new List<string>();
 
-                //TODO: optimize the linereading so that not all lines are retrieved if there are more then 100
-
-                //if file contains atleast a 100 rows, only return the most recent 100
-                var Lines = File.ReadLines($@"{Properties.Settings.Default.Path}\csgo\console2.log");
-                List<string> returnList;
-                if(Lines.Count() <= 100)
+                using (FileStream fs = new FileStream($@"{Properties.Settings.Default.Path}\csgo\console.log", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    returnList = Lines.ToList();
-                }
-                else
-                {
-                    returnList = Lines.Reverse().Take(amount).Reverse().ToList();
-                }
+                    fs.Seek(0, SeekOrigin.End);
 
-                //delete console2.log
-                File.Delete($@"{Properties.Settings.Default.Path}\csgo\console2.log");
-                return returnList;
+                    while (count < amount)
+                    {
+                        fs.Seek(-1, SeekOrigin.Current);
+                        fs.Read(buffer, 0, 1);
+                        if (buffer[0] == '\n')
+                        {
+                            count++;
+                        }
+
+                        fs.Seek(-1, SeekOrigin.Current); // fs.Read(...) advances the position, so we need to go back again
+                    }
+                    fs.Seek(1, SeekOrigin.Current); // go past the last '\n'
+
+                    string line;
+                    using (StreamReader sr = new StreamReader(fs))
+                    {
+                        while ((line = sr.ReadLine()) != null)
+                            consoleLines.Add(line);
+                    }
+                }
+                return consoleLines;
             }
             else
             {
@@ -50,28 +59,43 @@ namespace CsgoTranslator
             foreach (string l in lines)
             {
                 //filter the lines on chat message syntax
-                if(l.Contains(" : ") && !l.Contains("  : ") && !l.Contains(" :  "))
+                if (l.Contains(" : ") && !l.Contains("  : "))
                 {
+                    if (l.Contains(" :  "))
+                        if (!l.Contains("(Counter-Terrorist)") && !l.Contains("(Terrorist)"))
+                            continue;
+
                     bool name = true;
-                    foreach(string s in l.Split(':'))
+                    foreach (string s in l.Split(new string[] { " : " }, 2, StringSplitOptions.None))
                     {
-                        if(name)
+                        if (name)
                         {
-                            //removal of *DEAD* chat prefix
-                            if (s.Contains("*DEAD*"))
+                            string n = s;
+
+                            if (n.Contains("(Counter-Terrorist)"))
                             {
-                                returnNames.Add(s.Substring(0, s.Length - 1).Substring(7));
+                                n = n.Replace("(Counter-Terrorist)", "(CT)");
+                            }
+                            if (n.Contains("(Terrorist)"))
+                            {
+                                n = n.Replace("(Terrorist)", "(T)");
+                            }
+
+                            //removal of *DEAD* chat prefix
+                            if (n.Contains("*DEAD*"))
+                            {
+                                returnNames.Add(n.Substring(6));
                             }
                             else
                             {
-                                returnNames.Add(s.Substring(0, s.Length - 1));
+                                returnNames.Add(n);
                             }
 
                             name = false;
                         }
                         else
                         {
-                            returnMessages.Add(s.Substring(1));
+                            returnMessages.Add(s);
                         }
                     }
                 }
@@ -85,7 +109,7 @@ namespace CsgoTranslator
             List<Log> returnList = new List<Log>();
             List<string> lines = GetLastLines(amount);
 
-            if(lines != null)
+            if (lines != null && lines.Count() != 0)
             {
                 List<List<string>> rawLogs = LineCleaner(lines);
 
