@@ -22,7 +22,7 @@ namespace CsgoTranslator
                 {
                     fs.Seek(0, SeekOrigin.End);
 
-                    while (count < amount)
+                    while (count < amount && fs.Position > 0)
                     {
                         fs.Seek(-1, SeekOrigin.Current);
                         fs.Read(buffer, 0, 1);
