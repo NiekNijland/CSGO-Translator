@@ -5,9 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CsgoTranslator"
         mc:Ignorable="d"
-        Title="CSGO Translator" Height="441.813" Width="550" ResizeMode="NoResize">
+        Title="CSGO Translator" Height="467.813" Width="550" ResizeMode="NoResize">
     <Grid>
-        <ListView x:Name="ChatView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="355" Width="544">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="149*"/>
+            <ColumnDefinition Width="123*"/>
+        </Grid.ColumnDefinitions>
+        <ListView x:Name="ChatView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="357" Width="544" Grid.ColumnSpan="2">
             <ListView.View>
                 <GridView>
                     <GridView.ColumnHeaderContainerStyle>
@@ -20,11 +24,13 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <TextBlock FontSize="22" Margin="10,362,299,10">           
+        <TextBlock FontSize="22" Margin="10,398,144,5">           
             <Hyperlink NavigateUri="https://steamcommunity.com/profiles/76561198171831059" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="mad"/><InlineUIContainer>
                     
-                </InlineUIContainer><Run Text="e by NoekNoeland"/></Hyperlink>
+                </InlineUIContainer><Run Text="e by n00k"/></Hyperlink>
         </TextBlock>
-        <Button Content="Options" Margin="429,363,10,10" Click="BtnOptions_Click"/>
+        <Button Content="Options" Margin="131,398,10,6" Click="BtnOptions_Click" Grid.Column="1" RenderTransformOrigin="0.505,0.514"/>
+        <Label Content="Telnet:" HorizontalAlignment="Left" Margin="10,361,0,0" VerticalAlignment="Top" FontSize="20"/>
+        <Label x:Name="lbl_telnet_status" Content="" HorizontalAlignment="Left" Margin="82,362,0,0" VerticalAlignment="Top" FontSize="20"/>
     </Grid>
 </Window>

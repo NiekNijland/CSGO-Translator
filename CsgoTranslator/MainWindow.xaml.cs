@@ -3,19 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using CsgoTranslator;
 
 namespace CsgoTranslator
 {
@@ -26,15 +17,25 @@ namespace CsgoTranslator
     {
         public List<Log> Logs { get; set; }
         private DispatcherTimer CheckTimer = new DispatcherTimer();
+        private DispatcherTimer TelnetTimer = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
             CheckTimer.Interval = TimeSpan.FromSeconds(3);
             CheckTimer.Tick += UpdateChat;
+            CheckTimer.Tick += UpdateTelnetConnectionStatus;
             CheckTimer.Start();
+
+            TelnetTimer.Interval = TimeSpan.FromSeconds(5);
+            TelnetTimer.Tick += UpdateTelnetConnectionStatus;
+            TelnetTimer.Start();
+
             this.Logs = new List<Log>();
             ChatView.ItemsSource = this.Logs;
             OptionsController.CheckIfSet();
+
+            TelnetHelper.Connect();
+            UpdateTelnetConnectionStatus(null, null);
         }
 
         private void UpdateChat(object sender, EventArgs e)
@@ -54,6 +55,7 @@ namespace CsgoTranslator
                         else
                         {
                             this.Logs.Insert(0, l);
+                            TelnetHelper.ExecuteCsgoCommand($"say_team CSTRANS {l.Name} - {l.Message}");
                         }
                     }
                 }
@@ -64,6 +66,19 @@ namespace CsgoTranslator
                 MessageBox.Show(this, "Can't find console.log \nEnter the console command: con_logfile \"console.log\"\nor check csgo path in options window \n\nClick OK to continue", "CSGO Translator - Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.No);
             }
 
+        }
+
+        private void UpdateTelnetConnectionStatus(object sender, EventArgs e)
+        {
+            if (TelnetHelper.Connected)
+            {
+                lbl_telnet_status.Content = "Connected";
+            }
+            else
+            {
+                lbl_telnet_status.Content = "Disconnected";
+                TelnetHelper.Connect();
+            }
         }
 
         private void BtnOptions_Click(object sender, RoutedEventArgs e)

@@ -2,13 +2,36 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CsgoTranslator
 {
     static class LogsController
     {
+        static public List<Log> GetLogs(int amount)
+        {
+            List<Log> returnList = new List<Log>();
+            List<string> lines = GetLastLines(amount);
+
+            if (lines != null && lines.Count() != 0)
+            {
+                List<List<string>> rawLogs = LineCleaner(lines);
+
+                for (int i = 0; i < rawLogs[0].Count(); i++)
+                {
+                    if (!rawLogs[1][i].Contains("CSTRANS"))
+                    {
+                        returnList.Add(new Log(rawLogs[0][i], rawLogs[1][i]));
+                    }
+                }
+
+                return returnList;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         static private List<string> GetLastLines(int amount)
         {
             //check if file exists, if not return null so an error can be displayed
@@ -102,29 +125,6 @@ namespace CsgoTranslator
             }
 
             return new List<List<string>>() { returnNames, returnMessages };
-        }
-
-        static public List<Log> GetLogs(int amount)
-        {
-            List<Log> returnList = new List<Log>();
-            List<string> lines = GetLastLines(amount);
-
-            if (lines != null && lines.Count() != 0)
-            {
-                List<List<string>> rawLogs = LineCleaner(lines);
-
-                for (int i = 0; i < rawLogs[0].Count(); i++)
-                {
-                    returnList.Add(new Log(rawLogs[0][i], rawLogs[1][i]));
-                }
-
-                return returnList;
-            }
-            else
-            {
-                return null;
-            }
-
         }
     }
 }

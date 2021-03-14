@@ -8,11 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("grpc_csharp_ext.x86.dll")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("grpc_csharp_ext.x64.dll")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("libgrpc_csharp_ext.x86.so")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("libgrpc_csharp_ext.x64.so")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("libgrpc_csharp_ext.x86.dylib")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("libgrpc_csharp_ext.x64.dylib")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("minimalistictelnet/minimalistictelnet.sln")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("minimalistictelnet/minimalistictelnet/bin/release/minimalistictelnet.exe")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("minimalistictelnet/minimalistictelnet/bin/release/minimalistictelnet.pdb")]
 
 

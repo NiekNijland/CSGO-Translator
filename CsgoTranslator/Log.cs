@@ -22,7 +22,6 @@ namespace CsgoTranslator
         public void Translate()
         {
             this.Message = Translator.Translate(this.OriginalMessage);
-            //this.Message = this.OriginalMessage;
         }
     }
 }

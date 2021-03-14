@@ -21,11 +21,11 @@ namespace CsgoTranslator
                 Properties.Settings.Default.Save();
             }
         }
+
         static public void SaveDefault()
         {
-            Properties.Settings.Default.Lang = "en";
-            Properties.Settings.Default.Path = @"C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive";
-            Properties.Settings.Default.Save();
+            SaveLang("en");
+            SavePath(@"C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive");
         }
         static public void SavePath(string path)
         {

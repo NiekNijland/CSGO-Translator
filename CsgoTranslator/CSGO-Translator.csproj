@@ -83,11 +83,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\TelnetHelper.cs" />
+    <Compile Include="MinimalisticTelnet\MinimalisticTelnet.cs" />
     <Compile Include="OptionsController.cs" />
     <Compile Include="OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Translator.cs" />
+    <Compile Include="Helpers\Translator.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -97,7 +99,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Log.cs" />
-    <Compile Include="LogsController.cs" />
+    <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
