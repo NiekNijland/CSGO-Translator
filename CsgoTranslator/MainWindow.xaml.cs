@@ -15,57 +15,44 @@ namespace CsgoTranslator
     /// </summary>
     public partial class MainWindow : Window
     {
-        public List<Log> Logs { get; set; }
         private DispatcherTimer CheckTimer = new DispatcherTimer();
         private DispatcherTimer TelnetTimer = new DispatcherTimer();
         public MainWindow()
         {
+            LogsController.Chats = new List<Chat>();
+            LogsController.Commands = new List<Command>();
+
             InitializeComponent();
             CheckTimer.Interval = TimeSpan.FromSeconds(3);
-            CheckTimer.Tick += UpdateChat;
+            CheckTimer.Tick += TimerTick;
             CheckTimer.Tick += UpdateTelnetConnectionStatus;
             CheckTimer.Start();
 
-            TelnetTimer.Interval = TimeSpan.FromSeconds(5);
-            TelnetTimer.Tick += UpdateTelnetConnectionStatus;
-            TelnetTimer.Start();
-
-            this.Logs = new List<Log>();
-            ChatView.ItemsSource = this.Logs;
+            LogsController.Chats = new List<Chat>();
+            ChatView.ItemsSource = LogsController.Chats;
             OptionsController.CheckIfSet();
 
             TelnetHelper.Connect();
             UpdateTelnetConnectionStatus(null, null);
         }
 
-        private void UpdateChat(object sender, EventArgs e)
+        public void TimerTick(object sender, EventArgs e)
         {
-            List<Log> logs = LogsController.GetLogs(100);
-            if(logs != null)
-            {
-                foreach (Log l in logs)
-                {
-                    if (this.Logs.Where(x => x.OriginalMessage == l.OriginalMessage).Count() == 0)
-                    {
-                        l.Translate();
-                        if(l.Message == null)
-                        {
-                            MessageBox.Show(this,"Too many translation requests where made\nTry again later\n\nClick OK to retry", "CSGO Translator - Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                        else
-                        {
-                            this.Logs.Insert(0, l);
-                            TelnetHelper.ExecuteCsgoCommand($"say_team CSTRANS {l.Name} - {l.Message}");
-                        }
-                    }
-                }
-                ChatView.Items.Refresh();
-            }
-            else
-            {
-                MessageBox.Show(this, "Can't find console.log \nEnter the console command: con_logfile \"console.log\"\nor check csgo path in options window \n\nClick OK to continue", "CSGO Translator - Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.No);
-            }
+            LogsController.LoadLogs(100);
+            ChatView.Items.Refresh();
+            ExecuteCommands();
+        }
 
+        private void ExecuteCommands()
+        {
+            foreach (var command in LogsController.Commands)
+            {
+                if (!command.Executed)
+                {
+                    command.Execute();
+                    command.Executed = true;
+                }
+            }
         }
 
         private void UpdateTelnetConnectionStatus(object sender, EventArgs e)
@@ -85,7 +72,7 @@ namespace CsgoTranslator
         {
             CheckTimer.Stop();
             new OptionsWindow().ShowDialog();
-            this.Logs.Clear();
+            LogsController.Chats.Clear();
             CheckTimer.Start();
         }
 

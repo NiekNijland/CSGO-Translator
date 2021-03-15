@@ -7,32 +7,53 @@ namespace CsgoTranslator
 {
     static class LogsController
     {
-        static public List<Log> GetLogs(int amount)
+        static public List<Chat> Chats { get; set; }
+        static public List<Command> Commands { get; set; }
+
+        /// <summary>
+        /// Loads the amount rows from the console.log file. stores the output in Chats & Commands
+        /// </summary>
+        /// <param name="amount"></param>
+        static public void LoadLogs(int amount)
         {
-            List<Log> returnList = new List<Log>();
             List<string> lines = GetLastLines(amount);
 
             if (lines != null && lines.Count() != 0)
             {
-                List<List<string>> rawLogs = LineCleaner(lines);
+                var (chatTypes, names, messages) = LineCleaner(lines);
 
-                for (int i = 0; i < rawLogs[0].Count(); i++)
+                for (int i = 0; i < names.Count(); i++)
                 {
-                    if (!rawLogs[1][i].Contains("CSTRANS"))
+                    if (messages[i].StartsWith("!"))
                     {
-                        returnList.Add(new Log(rawLogs[0][i], rawLogs[1][i]));
+                        var possCommand = MakeCommand(chatTypes[i], names[i], messages[i]);
+
+                        if(possCommand != null)
+                        {
+                            Commands.Add(possCommand);
+                        }
+                    }
+                    else if(Chats.Where(x => x.Message == messages[i] && x.Name == names[i]).Count() == 0)
+                    {
+                        Chat chat = new Chat(chatTypes[i], names[i], messages[i]);
+                        Chats.Add(chat);
+                        if(chat.ChatType == ChatType.All)
+                        {
+                            TelnetHelper.SendTranslationInTeamChat(chat);
+                        }
+                        Console.WriteLine($"New chat message: {messages[i]}");
                     }
                 }
-
-                return returnList;
-            }
-            else
-            {
-                return null;
             }
         }
 
-        static private List<string> GetLastLines(int amount)
+        /// <summary>
+        /// Helper function for LoadLogs
+        /// Gets the latest amount rows from the console.log file.
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns>list with string of each line</returns>
+        private static List<string> GetLastLines(int amount)
         {
             //check if file exists, if not return null so an error can be displayed
             if (File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log"))
@@ -73,58 +94,142 @@ namespace CsgoTranslator
             }
         }
 
-        //function that checks all console log lines for chat messages and cleans them up. then returns 2 lists (1 with usernames, 1 with messages)
-        static private List<List<string>> LineCleaner(List<string> lines)
+        /// <summary>
+        /// Helper function for LoadLogs
+        /// function that checks all console log lines for chat messages and cleans them up. then returns 3 lists (ChatTypes, names & messages)
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns>tuple with chattypes names and messages for discovered chatlogs</returns>
+        private static (List<ChatType> chatTypes, List<string> names, List<string> messages) LineCleaner(List<string> lines)
         {
+            List<ChatType> returnChatTypes = new List<ChatType>();
             List<string> returnNames = new List<string>();
             List<string> returnMessages = new List<string>();
 
             foreach (string l in lines)
             {
                 //filter the lines on chat message syntax
-                if (l.Contains(" : ") && !l.Contains("  : "))
+                if (l.Contains(" : ") && !l.Contains("  : ") && !l.Contains("!."))
                 {
-                    if (l.Contains(" :  "))
-                        if (!l.Contains("(Counter-Terrorist)") && !l.Contains("(Terrorist)"))
-                            continue;
+                    string[] temp = l.Split(new string[] { " : " }, 2, StringSplitOptions.None);
 
-                    bool name = true;
-                    foreach (string s in l.Split(new string[] { " : " }, 2, StringSplitOptions.None))
+                    ChatType chatType = ChatType.All;
+                    string namePart = temp[0].Trim();
+                    string messagePart = temp[1].Trim();
+
+                    //removal of *DEAD* chat prefix.
+                    if (namePart.StartsWith("*DEAD*"))
                     {
-                        if (name)
+                        namePart = namePart.Substring(6).Trim();
+                    }
+
+                    //removal of teamchat prefix.
+                    if (namePart.StartsWith("(Counter-Terrorist)"))
+                    {
+                        namePart = namePart.Substring(19).Trim();
+                        chatType = ChatType.Team;
+                    }
+
+                    if (namePart.StartsWith("(Terrorist)"))
+                    {
+                        namePart = namePart.Substring(11).Trim();
+                        chatType = ChatType.Team;
+                    }
+
+                    //removal of the teamchat location info.
+                    if(chatType == ChatType.Team)
+                    {
+                        int idx = namePart.LastIndexOf('@');
+
+                        if (idx != -1)
                         {
-                            string n = s;
+                            namePart = namePart.Substring(0, idx).Trim();
+                        }
+                    }
 
-                            if (n.Contains("(Counter-Terrorist)"))
-                            {
-                                n = n.Replace("(Counter-Terrorist)", "(CT)");
-                            }
-                            if (n.Contains("(Terrorist)"))
-                            {
-                                n = n.Replace("(Terrorist)", "(T)");
-                            }
+                    returnChatTypes.Add(chatType);
+                    returnNames.Add(namePart);
+                    returnMessages.Add(messagePart);
+                }
+            }
 
-                            //removal of *DEAD* chat prefix
-                            if (n.Contains("*DEAD*"))
-                            {
-                                returnNames.Add(n.Substring(6));
-                            }
-                            else
-                            {
-                                returnNames.Add(n);
-                            }
+            return (chatTypes: returnChatTypes, names: returnNames, messages: returnMessages);
+        }
 
-                            name = false;
+        /// <summary>
+        /// Helper function for LoadLogs
+        /// function checks if given message contains a valid command and will return the correct command or null.
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns></returns>
+        private static Command MakeCommand(ChatType chatType, string name, string rawMessage)
+        {
+            string message = null;
+            string lang = null;
+
+            #region command validation
+
+            if (rawMessage.StartsWith("!trans_all"))
+            {
+                message = rawMessage.Substring(10).Trim();
+            }
+            else if (rawMessage.StartsWith("!trans_team"))
+            {
+                message = rawMessage.Substring(11).Trim();
+            }
+            else
+            {
+                return null;
+            }
+
+            #endregion
+
+            #region language param checking
+
+            //checking if there is a language param.
+            string[] temp = message.Split(new char[] { ' ' }, 2);
+            string possLang = temp[0].Trim();
+
+            if (possLang[0] == '-' && possLang.Length == 3)
+            {
+                lang = possLang.Substring(1);
+                message = temp[1].Trim();
+            }
+
+            #endregion
+
+            if (Commands.Where(x => x.Message == message && x.Name == name).Count() == 0)
+            {
+                Console.WriteLine($"imported command: {message}");
+                Console.WriteLine($"All commands: {Commands.Count}");
+
+                if (message.Length > 0)
+                {
+                    if (rawMessage.StartsWith("!trans_all"))
+                    {
+                        if (lang != null)
+                        {
+                            return new TransAllCommand(chatType, name, message, lang);
                         }
                         else
                         {
-                            returnMessages.Add(s);
+                            return new TransAllCommand(chatType, name, message);
+                        }
+                    }
+                    else if (rawMessage.StartsWith("!trans_team"))
+                    {
+                        if (lang != null)
+                        {
+                            return new TransTeamCommand(chatType, name, message, lang);
+                        }
+                        else
+                        {
+                            return new TransTeamCommand(chatType, name, message);
                         }
                     }
                 }
             }
-
-            return new List<List<string>>() { returnNames, returnMessages };
+            return null;
         }
     }
 }

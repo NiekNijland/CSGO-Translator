@@ -27,5 +27,20 @@ namespace CsgoTranslator
             _telnetConnection.WriteLine(command);
             return true;
         }
+
+        public static bool SendInTeamChat(string message)
+        {
+            return ExecuteCsgoCommand($"say_team !. {message}");
+        }
+
+        public static bool SendInAllChat(string message)
+        {
+            return ExecuteCsgoCommand($"say !. {message}");
+        }
+
+        public static bool SendTranslationInTeamChat(Chat chat)
+        {
+            return SendInTeamChat($"{chat.Name} : {chat.Translation}");
+        }
     }
 }
