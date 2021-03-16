@@ -36,7 +36,7 @@ namespace CsgoTranslator
                     else if(Chats.Where(x => x.Message == messages[i] && x.Name == names[i]).Count() == 0)
                     {
                         Chat chat = new Chat(chatTypes[i], names[i], messages[i]);
-                        Chats.Add(chat);
+                        Chats.Insert(0, chat);
                         if(chat.ChatType == ChatType.All && chat.Translation != chat.Message && chat.Translation != "")
                         {
                             TelnetHelper.SendTranslationInTeamChat(chat);
@@ -109,7 +109,7 @@ namespace CsgoTranslator
             foreach (string l in lines)
             {
                 //filter the lines on chat message syntax
-                if (l.Contains(" : ") && !l.Contains("  : ") && !l.Contains("!."))
+                if (l.Contains(" : ") && !l.Contains("  : ") && !l.Contains("!.") && !l.Trim().StartsWith("Duplicate :          "))
                 {
                     string[] temp = l.Split(new string[] { " : " }, 2, StringSplitOptions.None);
 
