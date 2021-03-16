@@ -1,11 +1,13 @@
-﻿namespace CsgoTranslator
+﻿using System;
+
+namespace CsgoTranslator
 {
     public abstract class Command
     {  
         public string Name { get; private set; }
         public string Message { get; set; }
         public ChatType ChatType { get; private set; }
-        public string CommandParams { get; private set; }
+        public string LangParam { get; private set; }
 
         private bool _executed;
         public bool Executed
@@ -20,12 +22,13 @@
             }
         }
 
-        protected Command(ChatType chatType, string name, string message, string commandParams = null)
+        protected Command(ChatType chatType, string name, string message, string langParam = null)
         {
             this.Name = name;
             this.Message = message;
             this.ChatType = chatType;
-            this.CommandParams = commandParams;
+            this.LangParam = langParam;
+            Console.WriteLine($"param: {langParam}");
             this.Executed = false;
         }
 

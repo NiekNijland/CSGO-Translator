@@ -6,7 +6,13 @@
 
         public override void Execute()
         {
-            TelnetHelper.SendInTeamChat(Translator.Translate(this.Message));
+            string translation = Translator.Translate(this.Message, this.LangParam).Trim();
+            
+            if(translation != this.Message && translation != "")
+            {
+                TelnetHelper.SendInTeamChat(translation);
+            }
+
             this.Executed = true;
         }
     }

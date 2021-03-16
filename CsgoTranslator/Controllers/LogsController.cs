@@ -37,7 +37,7 @@ namespace CsgoTranslator
                     {
                         Chat chat = new Chat(chatTypes[i], names[i], messages[i]);
                         Chats.Add(chat);
-                        if(chat.ChatType == ChatType.All)
+                        if(chat.ChatType == ChatType.All && chat.Translation != chat.Message && chat.Translation != "")
                         {
                             TelnetHelper.SendTranslationInTeamChat(chat);
                         }

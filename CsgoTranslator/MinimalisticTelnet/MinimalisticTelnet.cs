@@ -61,7 +61,9 @@ namespace MinimalisticTelnet
 
         public void WriteLine(string cmd)
         {
-            byte[] buf = System.Text.ASCIIEncoding.ASCII.GetBytes((cmd + "\n").Replace("\0xFF", "\0xFF\0xFF"));
+            var utf8 = Encoding.UTF8;
+            byte[] buf = utf8.GetBytes((cmd + "\n").Replace("\0xFF", "\0xFF\0xFF"));
+
             _tcpSocket.GetStream().Write(buf, 0, buf.Length);
         }
 
