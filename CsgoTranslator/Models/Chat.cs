@@ -1,6 +1,6 @@
 ﻿namespace CsgoTranslator
 {
-    public class Chat
+    public class Chat : Log
     {
         public ChatType ChatType { get; private set; }
         public string Name { get; private set; }
@@ -19,7 +19,7 @@
         }
         public string Message { get; private set; }
 
-        public Chat(ChatType chatType, string name, string message)
+        public Chat(Log previousLog, string rawString, ChatType chatType, string name, string message) : base(previousLog, rawString)
         {
             this._translation = null;
             this.Name = name;

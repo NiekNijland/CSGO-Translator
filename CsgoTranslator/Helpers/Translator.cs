@@ -13,6 +13,8 @@ namespace CsgoTranslator
         public static string Translate(string sourceText, string lang = null)
         {
             //Downloading translation
+
+            return sourceText;
             if(lang == null)
             {
                 lang = Properties.Settings.Default.Lang;

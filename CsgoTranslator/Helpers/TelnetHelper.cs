@@ -33,6 +33,18 @@ namespace CsgoTranslator
             return ExecuteCsgoCommand($"say_team !. {message}");
         }
 
+        internal static void SendTransCommand(TransCommand transCommand)
+        {
+            if(transCommand.TransType == TransType.TransAllCommand)
+            {
+                SendInAllChat(transCommand.Translation);
+            }
+            else if(transCommand.TransType == TransType.TransTeamCommand)
+            {
+                SendInTeamChat(transCommand.Translation);
+            }
+        }
+
         public static bool SendInAllChat(string message)
         {
             return ExecuteCsgoCommand($"say !. {message}");

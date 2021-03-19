@@ -2,11 +2,12 @@
 
 namespace CsgoTranslator
 {
-    public abstract class Command
-    {  
+    public abstract class Command : Log
+    {
+        public ChatType ChatType { get; private set; }
         public string Name { get; private set; }
         public string Message { get; set; }
-        public ChatType ChatType { get; private set; }
+
         public string LangParam { get; private set; }
 
         private bool _executed;
@@ -22,7 +23,7 @@ namespace CsgoTranslator
             }
         }
 
-        protected Command(ChatType chatType, string name, string message, string langParam = null)
+        protected Command(Log previousLog, string rawLog, ChatType chatType, string name, string message, string langParam = null) : base(previousLog, rawLog)
         {
             this.Name = name;
             this.Message = message;
