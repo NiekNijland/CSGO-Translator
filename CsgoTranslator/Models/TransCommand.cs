@@ -1,31 +1,28 @@
 ﻿namespace CsgoTranslator
 {
-    public enum TransType
-    {
-        Undefined,
-        TransAllCommand,
-        TransTeamCommand,
-    }
-
     public class TransCommand : Command
     {
-        public TransType TransType { get; private set; }
+        public ChatType ExportChatType { get; private set; }
         public string Translation { get; private set; }
 
-        public TransCommand(Log previousLog, string rawString, TransType transType, ChatType chatType, string name, string message, string commandParams = null) : base(previousLog, rawString, chatType, name, message, commandParams) 
+        public TransCommand(Log previousLog, string rawString, ChatType exportChatType, ChatType chatType, string name, string message, string commandParams = null) : base(previousLog, rawString, chatType, name, message, commandParams) 
         {
-            this.TransType = transType;
+            this.ExportChatType = exportChatType;
 
+        }
+
+        public void Translate()
+        {
+            this.Translation = Translator.Translate(this.Message, this.LangParam).Trim();
         }
 
         public override void Execute()
         {
-            string translation = Translator.Translate(this.Message, this.LangParam).Trim();
+            Translate();
             
-            if(translation != this.Message && translation != "")
+            if(this.Translation != this.Message && this.Translation != "")
             {
-                this.Translation = translation;
-                TelnetHelper.SendTransCommand(this);
+                TelnetHelper.SendInChat(this.ExportChatType, this.Translation);
             }
 
             this.Executed = true;

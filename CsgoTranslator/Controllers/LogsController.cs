@@ -29,7 +29,7 @@ namespace CsgoTranslator
                 {
                     if (rawMessage[i][0] == '!')
                     {
-                        var possCommand = CommandsController.BuildCommand(logs.Last.Value, rawStrings[i], chatTypes[i], names[i], rawMessage[i]);
+                        var possCommand = CommandsController.BuildCommand(logs.Last?.Value, rawStrings[i], chatTypes[i], names[i], rawMessage[i]);
 
                         if(possCommand != null)
                         {
@@ -42,62 +42,30 @@ namespace CsgoTranslator
                     }
                 }
 
-                /*
-                for (LinkedListNode<Log> node = logs.Last; node != null; node = node.Previous)
-                {
-                    Console.WriteLine((node.Value as Chat ).Message);
-                }
-                */
-
-                bool breakie = false;
                 List<Log> addList = new List<Log>();
-
-                if (Logs.Last != null)
-                {
-                    Console.WriteLine($"Lasted added value: {Logs.Last.Value.RawString}");
-                }
-                else
-                {
-                    Console.WriteLine("Lasted added value: null");
-                }
 
                 //if logs where found in the file.
                 if(logs.Last != null)
                 {
-                    //if the application doesn't contain any logs yet, or the latest found log is not identical as the latest added log.
-                    if (Logs.Last == null || logs.Last.Value.RawString != Logs.Last.Value.RawString)
+                    ///loop backwards over the array with the discovered logs.
+                    ///Check for each node if the node is identical to the last added node in the system.
+                    ///When the last added node was found, add all nodes that were looped over allready because they are new.
+                    for (LinkedListNode<Log> node = logs.Last; node != null; node = node.Previous)
                     {
-                        //add the new latest found log to the array that will be added to the system.
-                        Console.WriteLine($"Add because 0: {logs.Last.Value.RawString}");
-                        addList.Insert(0, logs.Last.Value);
-
-                        //loop back over the other logs to see how many others are new aswell.
-                        for (LinkedListNode<Log> node = logs.Last.Previous; node != null && !breakie; node = node.Previous)
+                        if(Logs.Last == null)
                         {
-                            if (Logs.Last == null || node.Value.RawString != Logs.Last.Value.RawString)
-                            {
-                                Console.WriteLine($"Add because 1:  {node.Value.RawString}");
-                                addList.Insert(0, node.Value);
-                            }
-                            else if (CompareByParents(node, Logs.Last))
-                            {
-                                Console.WriteLine($"Add because 2: {node.Value.RawString}");
-                                addList.Insert(0, node.Value);
-                            }
-                            else
-                            {
-                                break;
-                            }
-
-                            Console.WriteLine("_______");
+                            addList.Insert(0, node.Value);
+                        }
+                        else if (!Compare(Logs.Last, node))
+                        {
+                            addList.Insert(0, node.Value);
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
                 }
-
-
-
-
-                Console.WriteLine("=======");
 
                 foreach(Log log in addList)
                 {
@@ -111,6 +79,7 @@ namespace CsgoTranslator
                 if (log is Chat)
                 {
                     Chats.Insert(0, log as Chat);
+                    TelnetHelper.SendChatTranslation(ChatType.Team, (log as Chat));
                 }
                 else if(log is Command)
                 {
@@ -120,38 +89,43 @@ namespace CsgoTranslator
                 }
             }
 
-            static bool CompareByParents(LinkedListNode<Log> currentNode, LinkedListNode<Log> newNode)
+
+            /// <summary>
+            /// Compares 2 linkedlistNode<Log>'s by value and if necessary by parent nodes.
+            /// </summary>
+            /// <param name="lastAddedNode"></param>
+            /// <param name="newNode"></param>
+            static bool Compare(LinkedListNode<Log> lastAddedNode, LinkedListNode<Log> newNode)
             {
-                LinkedListNode<Log> currentTreeMember = currentNode;
-                LinkedListNode<Log> newTreeMember = newNode;
+                LinkedListNode<Log> lastAddedNodeRelative = lastAddedNode;
+                LinkedListNode<Log> newNodeRelative = newNode;
 
-                for (int i = 0; i < 5; i++)
+                if (lastAddedNodeRelative.Value.RawString == newNodeRelative.Value.RawString)
                 {
-                    if (newTreeMember != currentTreeMember)
+                    for (int i = 0; i < 3; i++)
                     {
-                        return false;
+                        lastAddedNodeRelative = lastAddedNodeRelative.Previous;
+                        newNodeRelative = newNodeRelative.Previous;
+
+                        if (lastAddedNodeRelative == null || newNodeRelative == null)
+                        {
+                            return true;
+                        }
+
+                        if (lastAddedNodeRelative.Value.RawString != newNodeRelative.Value.RawString)
+                        {
+                            return false;
+                        }
                     }
 
-                    newTreeMember = newTreeMember.Previous;
-                    currentTreeMember = currentTreeMember.Previous;
-
-                    if (currentTreeMember == null || newTreeMember == null)
-                    {
-                        return false;
-                    }
+                    return true;
                 }
-                return true;
+                else
+                {
+                    return false;
+                }
             }
         }
-
-
-        /*
-                        if (chat.ChatType == ChatType.All && chat.Translation != chat.Message && chat.Translation != "")
-                        {
-                            TelnetHelper.SendTranslationInTeamChat(chat);
-                        }
-                        Console.WriteLine($"New chat message: {rawMessage[i]}");
-        */
 
         /// <summary>
         /// Helper function for LoadLogs

@@ -18,7 +18,7 @@ namespace CsgoTranslator
         {
             string message = null;
             string lang = null;
-            TransType transType;
+            ChatType exportChatType;
 
 
             #region command validation
@@ -26,12 +26,12 @@ namespace CsgoTranslator
             if (rawMessage.StartsWith("!all"))
             {
                 message = rawMessage.Substring(4).Trim();
-                transType = TransType.TransAllCommand;
+                exportChatType = ChatType.All;
             }
             else if (rawMessage.StartsWith("!team"))
             {
                 message = rawMessage.Substring(5).Trim();
-                transType = TransType.TransTeamCommand;
+                exportChatType = ChatType.Team;
             }
             else
             {
@@ -58,9 +58,9 @@ namespace CsgoTranslator
             Console.WriteLine($"build command: {chatType} {name} {possLang} {message}");
             Console.WriteLine("------------");
 
-            if (message.Length > 0 && transType != TransType.Undefined)
+            if (message.Length > 0)
             {
-                return new TransCommand(previousLog, rawString, transType, chatType, name, message, lang);
+                return new TransCommand(previousLog, rawString, exportChatType, chatType, name, message, lang);
             }
             else
             {
