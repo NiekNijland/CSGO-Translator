@@ -7,6 +7,7 @@ namespace CsgoTranslator
 {
     static class LogsController
     {
+        static public LinkedList<Log> Logs { get; set; }
         static public List<Chat> Chats { get; set; }
         static public List<Command> Commands { get; set; }
 
@@ -16,33 +17,112 @@ namespace CsgoTranslator
         /// <param name="amount"></param>
         static public void LoadLogs(int amount)
         {
+            LinkedList<Log> logs = new LinkedList<Log>();
+
             List<string> lines = GetLastLines(amount);
 
             if (lines != null && lines.Count() != 0)
             {
-                var (chatTypes, names, messages) = LineCleaner(lines);
+                var (rawStrings, chatTypes, names, rawMessage) = LineCleaner(lines);
 
-                for (int i = 0; i < names.Count(); i++)
+                for (int i = 0; i < rawStrings.Count(); i++)
                 {
-                    if (messages[i].StartsWith("!"))
+                    if (rawMessage[i][0] == '!')
                     {
-                        var possCommand = MakeCommand(chatTypes[i], names[i], messages[i]);
+                        var possCommand = CommandsController.BuildCommand(logs.Last?.Value, rawStrings[i], chatTypes[i], names[i], rawMessage[i]);
 
                         if(possCommand != null)
                         {
-                            Commands.Add(possCommand);
+                            logs.AddLast(possCommand);
                         }
                     }
-                    else if(Chats.Where(x => x.Message == messages[i] && x.Name == names[i]).Count() == 0)
+                    else
                     {
-                        Chat chat = new Chat(chatTypes[i], names[i], messages[i]);
-                        Chats.Insert(0, chat);
-                        if(chat.ChatType == ChatType.All && chat.Translation != chat.Message && chat.Translation != "")
-                        {
-                            TelnetHelper.SendTranslationInTeamChat(chat);
-                        }
-                        Console.WriteLine($"New chat message: {messages[i]}");
+                        logs.AddLast(new Chat(logs.Last?.Value, rawStrings[i], chatTypes[i], names[i], rawMessage[i]));
                     }
+                }
+
+                List<Log> addList = new List<Log>();
+
+                //if logs where found in the file.
+                if(logs.Last != null)
+                {
+                    ///loop backwards over the array with the discovered logs.
+                    ///Check for each node if the node is identical to the last added node in the system.
+                    ///When the last added node was found, add all nodes that were looped over allready because they are new.
+                    for (LinkedListNode<Log> node = logs.Last; node != null; node = node.Previous)
+                    {
+                        if(Logs.Last == null)
+                        {
+                            addList.Insert(0, node.Value);
+                        }
+                        else if (!Compare(Logs.Last, node))
+                        {
+                            addList.Insert(0, node.Value);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                foreach(Log log in addList)
+                {
+                    SaveLog(log);
+                }
+            }
+
+            static void SaveLog(Log log)
+            {
+                Logs.AddLast(log);
+                if (log is Chat)
+                {
+                    Chats.Insert(0, log as Chat);
+                    TelnetHelper.SendChatTranslation(ChatType.Team, (log as Chat));
+                }
+                else if(log is Command)
+                {
+                    Commands.Insert(0, log as Command);
+                    Console.WriteLine($"Imported command: {(log as Command).Message}");
+                    Console.WriteLine($"Total commands: {Commands.Count}");
+                }
+            }
+
+
+            /// <summary>
+            /// Compares 2 linkedlistNode<Log>'s by value and if necessary by parent nodes.
+            /// </summary>
+            /// <param name="lastAddedNode"></param>
+            /// <param name="newNode"></param>
+            static bool Compare(LinkedListNode<Log> lastAddedNode, LinkedListNode<Log> newNode)
+            {
+                LinkedListNode<Log> lastAddedNodeRelative = lastAddedNode;
+                LinkedListNode<Log> newNodeRelative = newNode;
+
+                if (lastAddedNodeRelative.Value.RawString == newNodeRelative.Value.RawString)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        lastAddedNodeRelative = lastAddedNodeRelative.Previous;
+                        newNodeRelative = newNodeRelative.Previous;
+
+                        if (lastAddedNodeRelative == null || newNodeRelative == null)
+                        {
+                            return true;
+                        }
+
+                        if (lastAddedNodeRelative.Value.RawString != newNodeRelative.Value.RawString)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
         }
@@ -100,8 +180,9 @@ namespace CsgoTranslator
         /// </summary>
         /// <param name="lines"></param>
         /// <returns>tuple with chattypes names and messages for discovered chatlogs</returns>
-        private static (List<ChatType> chatTypes, List<string> names, List<string> messages) LineCleaner(List<string> lines)
+        private static (List<string> rawStrings, List<ChatType> chatTypes, List<string> names, List<string> messages) LineCleaner(List<string> lines)
         {
+            List<string> returnRawStrings = new List<string>();
             List<ChatType> returnChatTypes = new List<ChatType>();
             List<string> returnNames = new List<string>();
             List<string> returnMessages = new List<string>();
@@ -147,89 +228,14 @@ namespace CsgoTranslator
                         }
                     }
 
+                    returnRawStrings.Add(l);
                     returnChatTypes.Add(chatType);
                     returnNames.Add(namePart);
                     returnMessages.Add(messagePart);
                 }
             }
 
-            return (chatTypes: returnChatTypes, names: returnNames, messages: returnMessages);
-        }
-
-        /// <summary>
-        /// Helper function for LoadLogs
-        /// function checks if given message contains a valid command and will return the correct command or null.
-        /// </summary>
-        /// <param name="lines"></param>
-        /// <returns></returns>
-        private static Command MakeCommand(ChatType chatType, string name, string rawMessage)
-        {
-            string message = null;
-            string lang = null;
-
-            #region command validation
-
-            if (rawMessage.StartsWith("!trans_all"))
-            {
-                message = rawMessage.Substring(10).Trim();
-            }
-            else if (rawMessage.StartsWith("!trans_team"))
-            {
-                message = rawMessage.Substring(11).Trim();
-            }
-            else
-            {
-                return null;
-            }
-
-            #endregion
-
-            #region language param checking
-
-            //checking if there is a language param.
-            string[] temp = message.Split(new char[] { ' ' }, 2);
-            string possLang = temp[0].Trim();
-
-            if (possLang[0] == '-' && possLang.Length == 3)
-            {
-                lang = possLang.Substring(1);
-                message = temp[1].Trim();
-            }
-
-            #endregion
-
-            if (Commands.Where(x => x.Message == message && x.Name == name).Count() == 0)
-            {
-                Console.WriteLine($"imported command: {message}");
-                Console.WriteLine($"All commands: {Commands.Count}");
-
-                if (message.Length > 0)
-                {
-                    if (rawMessage.StartsWith("!trans_all"))
-                    {
-                        if (lang != null)
-                        {
-                            return new TransAllCommand(chatType, name, message, lang);
-                        }
-                        else
-                        {
-                            return new TransAllCommand(chatType, name, message);
-                        }
-                    }
-                    else if (rawMessage.StartsWith("!trans_team"))
-                    {
-                        if (lang != null)
-                        {
-                            return new TransTeamCommand(chatType, name, message, lang);
-                        }
-                        else
-                        {
-                            return new TransTeamCommand(chatType, name, message);
-                        }
-                    }
-                }
-            }
-            return null;
+            return (rawStrings: returnRawStrings, chatTypes: returnChatTypes, names: returnNames, messages: returnMessages);
         }
     }
 }

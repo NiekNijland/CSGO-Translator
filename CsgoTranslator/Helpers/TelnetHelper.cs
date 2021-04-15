@@ -20,7 +20,7 @@ namespace CsgoTranslator
             return _telnetConnection.Connected;
         }
 
-        public static bool ExecuteCsgoCommand(string command)
+        private static bool ExecuteCsgoCommand(string command)
         {
             if (!Connected) return false;
 
@@ -28,19 +28,19 @@ namespace CsgoTranslator
             return true;
         }
 
-        public static bool SendInTeamChat(string message)
+        public static bool SendInChat(ChatType chatType, string message)
         {
-            return ExecuteCsgoCommand($"say_team !. {message}");
+            return chatType switch
+            {
+                ChatType.All => ExecuteCsgoCommand($"say_team !. {message}"),
+                ChatType.Team => ExecuteCsgoCommand($"say !. {message}"),
+                _ => false,
+            };
         }
 
-        public static bool SendInAllChat(string message)
+        public static bool SendChatTranslation(ChatType chatType, Chat chat)
         {
-            return ExecuteCsgoCommand($"say !. {message}");
-        }
-
-        public static bool SendTranslationInTeamChat(Chat chat)
-        {
-            return SendInTeamChat($"{chat.Name} : {chat.Translation}");
+            return SendInChat(chatType, $"{chat.Name} : {chat.Translation}");
         }
     }
 }

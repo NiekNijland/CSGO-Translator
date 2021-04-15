@@ -19,6 +19,7 @@ namespace CsgoTranslator
         private DispatcherTimer TelnetTimer = new DispatcherTimer();
         public MainWindow()
         {
+            LogsController.Logs = new LinkedList<Log>();
             LogsController.Chats = new List<Chat>();
             LogsController.Commands = new List<Command>();
 
@@ -38,7 +39,7 @@ namespace CsgoTranslator
 
         public void TimerTick(object sender, EventArgs e)
         {
-            LogsController.LoadLogs(100);
+            LogsController.LoadLogs(30);
             ChatView.Items.Refresh();
             ExecuteCommands();
         }
