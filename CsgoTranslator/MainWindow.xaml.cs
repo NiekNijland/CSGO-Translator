@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using CsgoTranslator.Controllers;
+using CsgoTranslator.Helpers;
+using CsgoTranslator.Models;
 
 namespace CsgoTranslator
 {
@@ -15,8 +16,7 @@ namespace CsgoTranslator
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DispatcherTimer CheckTimer = new DispatcherTimer();
-        private DispatcherTimer TelnetTimer = new DispatcherTimer();
+        private readonly DispatcherTimer _checkTimer = new DispatcherTimer();
         public MainWindow()
         {
             LogsController.Logs = new LinkedList<Log>();
@@ -24,10 +24,10 @@ namespace CsgoTranslator
             LogsController.Commands = new List<Command>();
 
             InitializeComponent();
-            CheckTimer.Interval = TimeSpan.FromSeconds(3);
-            CheckTimer.Tick += TimerTick;
-            CheckTimer.Tick += UpdateTelnetConnectionStatus;
-            CheckTimer.Start();
+            _checkTimer.Interval = TimeSpan.FromSeconds(3);
+            _checkTimer.Tick += TimerTick;
+            _checkTimer.Tick += UpdateTelnetConnectionStatus;
+            _checkTimer.Start();
 
             LogsController.Chats = new List<Chat>();
             ChatView.ItemsSource = LogsController.Chats;
@@ -37,22 +37,19 @@ namespace CsgoTranslator
             UpdateTelnetConnectionStatus(null, null);
         }
 
-        public void TimerTick(object sender, EventArgs e)
+        private void TimerTick(object sender, EventArgs e)
         {
             LogsController.LoadLogs(30);
             ChatView.Items.Refresh();
             ExecuteCommands();
         }
 
-        private void ExecuteCommands()
+        static private void ExecuteCommands()
         {
-            foreach (var command in LogsController.Commands)
+            foreach (var command in LogsController.Commands.Where(command => !command.Executed))
             {
-                if (!command.Executed)
-                {
-                    command.Execute();
-                    command.Executed = true;
-                }
+                command.Execute();
+                command.Executed = true;
             }
         }
 
@@ -71,10 +68,10 @@ namespace CsgoTranslator
 
         private void BtnOptions_Click(object sender, RoutedEventArgs e)
         {
-            CheckTimer.Stop();
+            _checkTimer.Stop();
             new OptionsWindow().ShowDialog();
             LogsController.Chats.Clear();
-            CheckTimer.Start();
+            _checkTimer.Start();
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

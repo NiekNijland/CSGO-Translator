@@ -1,18 +1,13 @@
-﻿using System;
-using MinimalisticTelnet;
+﻿using CsgoTranslator.MinimalisticTelnet;
+using CsgoTranslator.Models;
 
-namespace CsgoTranslator
+namespace CsgoTranslator.Helpers
 {
-    static class TelnetHelper
+    internal static class TelnetHelper
     {
         private static TelnetConnection _telnetConnection;
 
-        public static bool Connected
-        {
-            get {
-                return (_telnetConnection != null && _telnetConnection.Connected);
-            }
-        }
+        public static bool Connected => (_telnetConnection != null && _telnetConnection.Connected);
 
         public static bool Connect()
         {
@@ -25,6 +20,7 @@ namespace CsgoTranslator
             if (!Connected) return false;
 
             _telnetConnection.WriteLine(command);
+            
             return true;
         }
 

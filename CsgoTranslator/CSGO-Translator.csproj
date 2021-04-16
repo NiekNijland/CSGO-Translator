@@ -86,11 +86,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controllers\ChatsController.cs" />
     <Compile Include="Controllers\CommandsController.cs" />
     <Compile Include="Helpers\TelnetHelper.cs" />
-    <Compile Include="MinimalisticTelnet\MinimalisticTelnet.cs" />
+    <Compile Include="MinimalisticTelnet\Options.cs" />
     <Compile Include="Controllers\OptionsController.cs" />
+    <Compile Include="MinimalisticTelnet\TelnetConnection.cs" />
+    <Compile Include="MinimalisticTelnet\Verbs.cs" />
     <Compile Include="Models\ChatType.cs" />
     <Compile Include="Models\Command.cs" />
     <Compile Include="Models\Log.cs" />

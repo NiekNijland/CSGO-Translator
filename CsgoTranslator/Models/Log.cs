@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CsgoTranslator
+﻿namespace CsgoTranslator.Models
 {
     public class Log
     {
-        public Log PreviousLog { get; set; }
+        public string RawString { get; }
 
-        public string RawString { get; private set; }
-
-        public Log(Log previousLog, string rawString)
+        protected Log(string rawString)
         {
-            this.PreviousLog = previousLog;
-            this.RawString = rawString;
+            RawString = rawString;
         }
     }
 }

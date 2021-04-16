@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CsgoTranslator.Models;
 
-namespace CsgoTranslator
+namespace CsgoTranslator.Controllers
 {
     public static class CommandsController
     {
@@ -12,14 +9,10 @@ namespace CsgoTranslator
         /// Helper function for LoadLogs
         /// function checks if given message contains a valid command and will return the correct command or null.
         /// </summary>
-        /// <param name="lines"></param>
-        /// <returns></returns>
-        public static Command BuildCommand(Log previousLog, string rawString, ChatType chatType, string name, string rawMessage)
+        public static Command BuildCommand(string rawString, ChatType chatType, string name, string rawMessage)
         {
-            string message = null;
-            string lang = null;
+            string message;
             ChatType exportChatType;
-
 
             #region command validation
 
@@ -43,29 +36,20 @@ namespace CsgoTranslator
             #region language param checking
 
             //checking if there is a language param.
-            string[] temp = message.Split(new char[] { ' ' }, 2);
-            string possLang = temp[0].Trim();
+            var temp = message.Split(new char[] { ' ' }, 2);
+            var possLang = temp[0].Trim();
 
-            if (possLang[0] == '-' && possLang.Length == 3)
-            {
-                lang = possLang.Substring(1);
-                message = temp[1].Trim();
-            }
+            if (possLang[0] != '-' || possLang.Length != 3)
+                return message.Length > 0
+                    ? new TransCommand(rawString, exportChatType, chatType, name, message)
+                    : null;
+            
+            var lang = possLang.Substring(1);
+            message = temp[1].Trim();
 
             #endregion
 
-            Console.WriteLine("------------");
-            Console.WriteLine($"build command: {chatType} {name} {possLang} {message}");
-            Console.WriteLine("------------");
-
-            if (message.Length > 0)
-            {
-                return new TransCommand(previousLog, rawString, exportChatType, chatType, name, message, lang);
-            }
-            else
-            {
-                return null;
-            }
+            return message.Length > 0 ? new TransCommand(rawString, exportChatType, chatType, name, message, lang) : null;
         }
     }
 }

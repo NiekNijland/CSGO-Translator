@@ -2,55 +2,55 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CsgoTranslator.Helpers;
+using CsgoTranslator.Models;
 
-namespace CsgoTranslator
+namespace CsgoTranslator.Controllers
 {
-    static class LogsController
+    internal static class LogsController
     {
-        static public LinkedList<Log> Logs { get; set; }
-        static public List<Chat> Chats { get; set; }
-        static public List<Command> Commands { get; set; }
+        public static LinkedList<Log> Logs { get; set; }
+        public static List<Chat> Chats { get; set; }
+        public static List<Command> Commands { get; set; }
 
         /// <summary>
         /// Loads the amount rows from the console.log file. stores the output in Chats & Commands
         /// </summary>
         /// <param name="amount"></param>
-        static public void LoadLogs(int amount)
+        public static void LoadLogs(int amount)
         {
-            LinkedList<Log> logs = new LinkedList<Log>();
+            var logs = new LinkedList<Log>();
 
-            List<string> lines = GetLastLines(amount);
+            var lines = GetLastLines(amount);
 
             if (lines != null && lines.Count() != 0)
             {
                 var (rawStrings, chatTypes, names, rawMessage) = LineCleaner(lines);
 
-                for (int i = 0; i < rawStrings.Count(); i++)
+                for (var i = 0; i < rawStrings.Count(); i++)
                 {
                     if (rawMessage[i][0] == '!')
                     {
-                        var possCommand = CommandsController.BuildCommand(logs.Last?.Value, rawStrings[i], chatTypes[i], names[i], rawMessage[i]);
-
-                        if(possCommand != null)
-                        {
-                            logs.AddLast(possCommand);
-                        }
+                        var possCommand = CommandsController.BuildCommand(rawStrings[i], chatTypes[i], names[i], rawMessage[i]);
+                        if(possCommand != null) logs.AddLast(possCommand);
                     }
                     else
                     {
-                        logs.AddLast(new Chat(logs.Last?.Value, rawStrings[i], chatTypes[i], names[i], rawMessage[i]));
+                        logs.AddLast(new Chat(rawStrings[i], chatTypes[i], names[i], rawMessage[i]));
                     }
                 }
 
-                List<Log> addList = new List<Log>();
+                var addList = new List<Log>();
 
                 //if logs where found in the file.
                 if(logs.Last != null)
                 {
-                    ///loop backwards over the array with the discovered logs.
-                    ///Check for each node if the node is identical to the last added node in the system.
-                    ///When the last added node was found, add all nodes that were looped over allready because they are new.
-                    for (LinkedListNode<Log> node = logs.Last; node != null; node = node.Previous)
+                    /*
+                        loop backwards over the array with the discovered logs.
+                        Check for each node if the node is identical to the last added node in the system.
+                        When the last added node was found, add all nodes that were looped over allready because they are new.
+                    */
+                    for (var node = logs.Last; node != null; node = node.Previous)
                     {
                         if(Logs.Last == null)
                         {
@@ -67,7 +67,7 @@ namespace CsgoTranslator
                     }
                 }
 
-                foreach(Log log in addList)
+                foreach(var log in addList)
                 {
                     SaveLog(log);
                 }
@@ -76,54 +76,35 @@ namespace CsgoTranslator
             static void SaveLog(Log log)
             {
                 Logs.AddLast(log);
-                if (log is Chat)
+                switch (log)
                 {
-                    Chats.Insert(0, log as Chat);
-                    TelnetHelper.SendChatTranslation(ChatType.Team, (log as Chat));
-                }
-                else if(log is Command)
-                {
-                    Commands.Insert(0, log as Command);
-                    Console.WriteLine($"Imported command: {(log as Command).Message}");
-                    Console.WriteLine($"Total commands: {Commands.Count}");
+                    case Chat chat:
+                        Chats.Insert(0, chat);
+                        TelnetHelper.SendChatTranslation(ChatType.Team, chat);
+                        break;
+                    case Command command:
+                        Commands.Insert(0, command);
+                        break;
                 }
             }
 
-
-            /// <summary>
-            /// Compares 2 linkedlistNode<Log>'s by value and if necessary by parent nodes.
-            /// </summary>
-            /// <param name="lastAddedNode"></param>
-            /// <param name="newNode"></param>
             static bool Compare(LinkedListNode<Log> lastAddedNode, LinkedListNode<Log> newNode)
             {
-                LinkedListNode<Log> lastAddedNodeRelative = lastAddedNode;
-                LinkedListNode<Log> newNodeRelative = newNode;
+                var lastAddedNodeRelative = lastAddedNode;
+                var newNodeRelative = newNode;
 
-                if (lastAddedNodeRelative.Value.RawString == newNodeRelative.Value.RawString)
+                if (lastAddedNodeRelative.Value.RawString != newNodeRelative.Value.RawString) return false;
+                
+                for (var i = 0; i < 3; i++)
                 {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        lastAddedNodeRelative = lastAddedNodeRelative.Previous;
-                        newNodeRelative = newNodeRelative.Previous;
+                    lastAddedNodeRelative = lastAddedNodeRelative.Previous;
+                    newNodeRelative = newNodeRelative.Previous;
 
-                        if (lastAddedNodeRelative == null || newNodeRelative == null)
-                        {
-                            return true;
-                        }
-
-                        if (lastAddedNodeRelative.Value.RawString != newNodeRelative.Value.RawString)
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
+                    if (lastAddedNodeRelative == null || newNodeRelative == null) return true;
+                    if (lastAddedNodeRelative.Value.RawString != newNodeRelative.Value.RawString) return false;
                 }
-                else
-                {
-                    return false;
-                }
+                
+                return true;
             }
         }
 
@@ -136,42 +117,31 @@ namespace CsgoTranslator
         private static List<string> GetLastLines(int amount)
         {
             //check if file exists, if not return null so an error can be displayed
-            if (File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log"))
+            if (!File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log")) return null;
+            
+            var count = 0;
+            var buffer = new byte[1];
+            var consoleLines = new List<string>();
+
+            using var fs = new FileStream($@"{Properties.Settings.Default.Path}\csgo\console.log", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            fs.Seek(0, SeekOrigin.End);
+
+            while (count < amount)
             {
-                int count = 0;
-                byte[] buffer = new byte[1];
-                List<string> consoleLines = new List<string>();
+                fs.Seek(-1, SeekOrigin.Current);
+                fs.Read(buffer, 0, 1);
+                if (buffer[0] == '\n') count++;
 
-                using (FileStream fs = new FileStream($@"{Properties.Settings.Default.Path}\csgo\console.log", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                {
-                    fs.Seek(0, SeekOrigin.End);
-
-                    while (count < amount)
-                    {
-                        fs.Seek(-1, SeekOrigin.Current);
-                        fs.Read(buffer, 0, 1);
-                        if (buffer[0] == '\n')
-                        {
-                            count++;
-                        }
-
-                        fs.Seek(-1, SeekOrigin.Current); // fs.Read(...) advances the position, so we need to go back again
-                    }
-                    fs.Seek(1, SeekOrigin.Current); // go past the last '\n'
-
-                    string line;
-                    using (StreamReader sr = new StreamReader(fs))
-                    {
-                        while ((line = sr.ReadLine()) != null)
-                            consoleLines.Add(line);
-                    }
-                }
-                return consoleLines;
+                fs.Seek(-1, SeekOrigin.Current); // fs.Read(...) advances the position, so we need to go back again
             }
-            else
-            {
-                return null;
-            }
+            fs.Seek(1, SeekOrigin.Current); // go past the last '\n'
+
+            using var sr = new StreamReader(fs);
+            string line;
+            while ((line = sr.ReadLine()) != null)
+                consoleLines.Add(line);
+
+            return consoleLines;
         }
 
         /// <summary>
@@ -179,60 +149,55 @@ namespace CsgoTranslator
         /// function that checks all console log lines for chat messages and cleans them up. then returns 3 lists (ChatTypes, names & messages)
         /// </summary>
         /// <param name="lines"></param>
-        /// <returns>tuple with chattypes names and messages for discovered chatlogs</returns>
-        private static (List<string> rawStrings, List<ChatType> chatTypes, List<string> names, List<string> messages) LineCleaner(List<string> lines)
+        /// <returns>tuple with chat-types names and messages for discovered chatlogs</returns>
+        private static (List<string> rawStrings, List<ChatType> chatTypes, List<string> names, List<string> messages) LineCleaner(IEnumerable<string> lines)
         {
-            List<string> returnRawStrings = new List<string>();
-            List<ChatType> returnChatTypes = new List<ChatType>();
-            List<string> returnNames = new List<string>();
-            List<string> returnMessages = new List<string>();
+            var returnRawStrings = new List<string>();
+            var returnChatTypes = new List<ChatType>();
+            var returnNames = new List<string>();
+            var returnMessages = new List<string>();
 
-            foreach (string l in lines)
+            foreach (var l in lines)
             {
                 //filter the lines on chat message syntax
-                if (l.Contains(" : ") && !l.Contains("  : ") && !l.Contains("!.") && !l.Trim().StartsWith("Duplicate :          "))
+                if (!l.Contains(" : ") || l.Contains("  : ") || l.Contains("!.") ||
+                    l.Trim().StartsWith("Duplicate :          ")) continue;
+                var temp = l.Split(new string[] { " : " }, 2, StringSplitOptions.None);
+
+                var chatType = ChatType.All;
+                var namePart = temp[0].Trim();
+                var messagePart = temp[1].Trim();
+
+                //removal of *DEAD* chat prefix.
+                if (namePart.StartsWith("*DEAD*"))
+                    namePart = namePart.Substring(6).Trim();
+
+                //removal of team-chat prefix.
+                if (namePart.StartsWith("(Counter-Terrorist)"))
                 {
-                    string[] temp = l.Split(new string[] { " : " }, 2, StringSplitOptions.None);
-
-                    ChatType chatType = ChatType.All;
-                    string namePart = temp[0].Trim();
-                    string messagePart = temp[1].Trim();
-
-                    //removal of *DEAD* chat prefix.
-                    if (namePart.StartsWith("*DEAD*"))
-                    {
-                        namePart = namePart.Substring(6).Trim();
-                    }
-
-                    //removal of teamchat prefix.
-                    if (namePart.StartsWith("(Counter-Terrorist)"))
-                    {
-                        namePart = namePart.Substring(19).Trim();
-                        chatType = ChatType.Team;
-                    }
-
-                    if (namePart.StartsWith("(Terrorist)"))
-                    {
-                        namePart = namePart.Substring(11).Trim();
-                        chatType = ChatType.Team;
-                    }
-
-                    //removal of the teamchat location info.
-                    if(chatType == ChatType.Team)
-                    {
-                        int idx = namePart.LastIndexOf('@');
-
-                        if (idx != -1)
-                        {
-                            namePart = namePart.Substring(0, idx).Trim();
-                        }
-                    }
-
-                    returnRawStrings.Add(l);
-                    returnChatTypes.Add(chatType);
-                    returnNames.Add(namePart);
-                    returnMessages.Add(messagePart);
+                    namePart = namePart.Substring(19).Trim();
+                    chatType = ChatType.Team;
                 }
+
+                if (namePart.StartsWith("(Terrorist)"))
+                {
+                    namePart = namePart.Substring(11).Trim();
+                    chatType = ChatType.Team;
+                }
+
+                //removal of the team-chat location info.
+                if(chatType == ChatType.Team)
+                {
+                    var idx = namePart.LastIndexOf('@');
+
+                    if (idx != -1)
+                        namePart = namePart.Substring(0, idx).Trim();
+                }
+
+                returnRawStrings.Add(l);
+                returnChatTypes.Add(chatType);
+                returnNames.Add(namePart);
+                returnMessages.Add(messagePart);
             }
 
             return (rawStrings: returnRawStrings, chatTypes: returnChatTypes, names: returnNames, messages: returnMessages);
