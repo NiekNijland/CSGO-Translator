@@ -1,4 +1,5 @@
-﻿using CsgoTranslator.MinimalisticTelnet;
+﻿using CsgoTranslator.Enums;
+using CsgoTranslator.MinimalisticTelnet;
 using CsgoTranslator.Models;
 
 namespace CsgoTranslator.Helpers

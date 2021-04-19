@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using CsgoTranslator.Controllers;
+using CsgoTranslator.Enums;
 using CsgoTranslator.Helpers;
 using CsgoTranslator.Models;
 
@@ -31,7 +32,7 @@ namespace CsgoTranslator
 
             LogsController.Chats = new List<Chat>();
             ChatView.ItemsSource = LogsController.Chats;
-            OptionsController.CheckIfSet();
+            OptionsManager.ValidateSettings();
 
             TelnetHelper.Connect();
             UpdateTelnetConnectionStatus(null, null);
@@ -59,10 +60,14 @@ namespace CsgoTranslator
             {
                 lbl_telnet_status.Content = "Connected";
             }
-            else
+            else if(OptionsManager.SendTranslationsFrom != TelnetGrant.Undefined)
             {
                 lbl_telnet_status.Content = "Disconnected";
                 TelnetHelper.Connect();
+            }
+            else
+            {
+                lbl_telnet_status.Content = "Disabled";
             }
         }
 

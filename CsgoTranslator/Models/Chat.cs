@@ -1,4 +1,5 @@
-﻿using CsgoTranslator.Helpers;
+﻿using CsgoTranslator.Enums;
+using CsgoTranslator.Helpers;
 
 namespace CsgoTranslator.Models
 {

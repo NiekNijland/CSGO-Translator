@@ -8,6 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using CsgoTranslator.Enums;
+
 namespace CsgoTranslator.Properties {
     
     
@@ -46,5 +48,12 @@ namespace CsgoTranslator.Properties {
                 this["Lang"] = value;
             }
         }
+
+        public string OwnUsername { get; set; }
+        public int TelnetPort { get; set; }
+        public TelnetGrant SendTranslationsTo { get; set; }
+        public TelnetGrant SendTranslationsFrom { get; set; }
+        public TelnetGrant AllowCommandsFrom { get; set; }
+        public bool IgnoreOwnMessages { get; set; }
     }
 }

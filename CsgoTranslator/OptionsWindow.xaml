@@ -5,13 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CsgoTranslator"
         mc:Ignorable="d"
-        Title="CSGO-Translator - Options" Height="148.711" Width="664.304">
+        Title="CSGO-Translator - Options" Height="389.302" Width="664.304">
     <Grid>
-        <Label Content="Install location:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
-        <TextBox x:Name="tbFolderPath" HorizontalAlignment="Left" Height="23" Margin="104,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
-        <Button Content="Save" HorizontalAlignment="Left" Margin="571,88,0,0" VerticalAlignment="Top" Width="75" Click="BtnSaveOptions_Click"/>
+        <Label Content="Install location:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,11,0,0"/>
+        <TextBox x:Name="TbFolderPath" HorizontalAlignment="Left" Height="23" Margin="104,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
+
         <Label Content="Language:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,46,0,0"/>
-        <TextBox x:Name="tbLang" HorizontalAlignment="Left" Height="23" Margin="104,49,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542" MaxLength="2"/>
-        <Button Content="Set default" HorizontalAlignment="Left" Margin="470,88,0,0" VerticalAlignment="Top" Width="75" Click="BtnSetDefault_Click"/>
+        <TextBox x:Name="TbLang" HorizontalAlignment="Left" Height="23" Margin="104,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542" MaxLength="2"/>
+
+        <Label Content="Own username:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,81,0,0"/>
+        <TextBox x:Name="TbOwnUsername" TextChanged="TbOwnUsername_TextChanged" HorizontalAlignment="Left" Height="23" Margin="104,85,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
+        <Label Content="Required for ignoring own messages and allowing commands from self" HorizontalAlignment="Left" Margin="102,102,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="10"/>
+        
+        <Label Content="Ignore own messages:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,132,0,0"/>
+        <CheckBox x:Name="CbIgnoreOwnMessages" HorizontalAlignment="Left" Margin="143,138,0,0" VerticalAlignment="Top"/>
+
+        <Label Content="Telnet settings (requires additional launch option)" HorizontalAlignment="Left" Margin="10,170,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <GridSplitter HorizontalAlignment="Left" Height="1" Margin="10,193,0,0" VerticalAlignment="Top" Width="636" Background="Black"/>
+
+        <Label Content="Send translations of:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,203,0,0"/>
+        <CheckBox x:Name="CbTransFromAll" Content="all-chat" HorizontalAlignment="Left" Margin="143,211,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CbTransFromTeam" Content="team-chat" HorizontalAlignment="Left" Margin="215,211,0,0" VerticalAlignment="Top"/>
+
+        <Label Content="Send translations to:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,235,0,0"/>
+        <RadioButton x:Name="RbTransToAll" GroupName="TransTo" Content="all-chat" HorizontalAlignment="Left" Margin="143,242,0,0" VerticalAlignment="Top"/>
+        <RadioButton x:Name="RbTransToTeam" GroupName="TransTo" Content="team-chat" HorizontalAlignment="Left" Margin="215,242,0,0" VerticalAlignment="Top"/>
+
+        <Label Content="Telnet port:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,268,0,0"/>
+        <TextBox x:Name="TbTelnetPort" PreviewTextInput="TbTelnetPort_OnPreviewTextInput" HorizontalAlignment="Left" Height="23" Margin="104,272,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
+
+        <Label Content="Allow commands from:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,300,0,0"/>
+        <RadioButton x:Name="RbCommandsTeam" GroupName="CommandsFrom" Content="team-chat" HorizontalAlignment="Left" Margin="199,306,0,0" VerticalAlignment="Top"/>
+        <RadioButton x:Name="RbCommandsBoth" GroupName="CommandsFrom" Content="team-chat &amp; all-chat" HorizontalAlignment="Left" Margin="287,306,0,0" VerticalAlignment="Top"/>
+        <RadioButton x:Name="RbCommandsSelf" GroupName="CommandsFrom" Content="self" HorizontalAlignment="Left" Margin="147,306,0,0" VerticalAlignment="Top"/>
+
+        <Button Content="Set default" HorizontalAlignment="Left" Margin="483,328,0,0" VerticalAlignment="Top" Width="75" Click="BtnSetDefault_Click"/>
+        <Button Content="Save" HorizontalAlignment="Left" Margin="571,328,0,0" VerticalAlignment="Top" Width="75" Click="BtnSaveOptions_Click"/>
     </Grid>
 </Window>

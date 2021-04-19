@@ -1,4 +1,4 @@
-﻿namespace CsgoTranslator.Models
+﻿namespace CsgoTranslator.Enums
 {
     public enum ChatType
     {

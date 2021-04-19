@@ -1,43 +1,185 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using CsgoTranslator.Controllers;
+using CsgoTranslator.Enums;
+using CsgoTranslator.Helpers;
+using CsgoTranslator.MinimalisticTelnet;
 
 namespace CsgoTranslator
 {
     /// <summary>
     /// Interaction logic for OptionsWindow.xaml
     /// </summary>
-    public partial class OptionsWindow : Window
+    public partial class OptionsWindow 
     {
+        private TelnetGrant TransToRadioButtons
+        {
+            get => RbTransToAll.IsChecked != null && (bool) (RbTransToAll.IsChecked) ? TelnetGrant.AllChat : TelnetGrant.TeamChat;
+            set
+            {
+                if (value == TelnetGrant.AllChat)
+                {
+                    RbTransToAll.IsChecked = true;    
+                }
+                else
+                {
+                    RbTransToTeam.IsChecked = true;
+                }
+            }
+        }
+        private TelnetGrant CommandsFromRadioButtons
+        {
+            get
+            {
+                if (RbCommandsBoth.IsChecked != null && (bool) RbCommandsBoth.IsChecked)
+                    return TelnetGrant.BothChats;
+                
+                if(RbCommandsTeam.IsChecked != null && (bool) RbCommandsTeam.IsChecked)
+                    return TelnetGrant.TeamChat;
+                
+                return TelnetGrant.Self;
+            }
+            set
+            {
+                switch (value)
+                {
+                    case TelnetGrant.BothChats:
+                        RbCommandsBoth.IsChecked = true;
+                        break;
+                    case TelnetGrant.TeamChat:
+                        RbCommandsTeam.IsChecked = true;
+                        break;
+                    default:
+                        RbCommandsSelf.IsChecked = true;
+                        break;
+                }
+            }
+        }
+        private TelnetGrant TransFromCheckBoxes
+        {
+            get
+            {
+                var returnValue = TelnetGrant.Undefined;
+
+                if (CbTransFromAll.IsChecked != null && (bool) CbTransFromAll.IsChecked)
+                    returnValue = TelnetGrant.AllChat;
+
+                if (CbTransFromTeam.IsChecked != null && (bool) CbTransFromTeam.IsChecked)
+                    return returnValue == TelnetGrant.Undefined ? TelnetGrant.TeamChat : TelnetGrant.BothChats;
+
+                return returnValue;
+            }
+            set
+            {
+                switch (value)
+                {
+                    case TelnetGrant.BothChats:
+                        CbTransFromAll.IsChecked = true;
+                        CbTransFromTeam.IsChecked = true;
+                        break;
+                    case TelnetGrant.TeamChat:
+                        CbTransFromTeam.IsChecked = true;
+                        CbTransFromAll.IsChecked = false;
+                        break;
+                    case TelnetGrant.AllChat:
+                        CbTransFromTeam.IsChecked = false;
+                        CbTransFromAll.IsChecked = true;
+                        break;
+                    default:
+                        CbTransFromAll.IsChecked = false;
+                        CbTransFromTeam.IsChecked = false;
+                        break;
+                }
+            }
+        }
+        private bool IgnoreOwnMessages
+        {
+            get => CbIgnoreOwnMessages.IsChecked != null && (bool) CbIgnoreOwnMessages.IsChecked;
+            set => CbIgnoreOwnMessages.IsChecked = value;
+        }
+        private string OwnUsername
+        {
+            get => TbOwnUsername.Text;
+            set
+            {
+                TbOwnUsername.Text = value;
+
+                if (value.Length > 0)
+                {
+                    CbIgnoreOwnMessages.IsEnabled = true;
+                    RbCommandsSelf.IsEnabled = true;
+                }
+                else
+                {
+                    CbIgnoreOwnMessages.IsEnabled = false;
+                    RbCommandsSelf.IsEnabled = false;
+                }
+            }
+        }
+        
         public OptionsWindow()
         {
             InitializeComponent();
-            this.tbFolderPath.Text = OptionsController.GetPath();
-            this.tbLang.Text = OptionsController.GetLang();
+            LoadOptions();
+        }
+
+        private void LoadOptions()
+        {
+            TbFolderPath.Text = OptionsManager.InstallationPath;
+            TbLang.Text = OptionsManager.Language;
+            OwnUsername = OptionsManager.OwnUsername;
+            TbTelnetPort.Text = OptionsManager.TelnetPort.ToString();
+            TransToRadioButtons = OptionsManager.SendTranslationsTo;
+            CommandsFromRadioButtons = OptionsManager.AllowCommandsFrom;
+            TransFromCheckBoxes = OptionsManager.SendTranslationsFrom;
+            IgnoreOwnMessages = OptionsManager.IgnoreOwnMessages;
         }
 
         private void BtnSaveOptions_Click(object sender, RoutedEventArgs e)
         {
-            OptionsController.SavePath(tbFolderPath.Text);
-            OptionsController.SaveLang(tbLang.Text);
-            this.Close();
+            OptionsManager.InstallationPath = TbFolderPath.Text;
+            OptionsManager.Language = TbLang.Text;
+            OptionsManager.OwnUsername = TbOwnUsername.Text;
+            OptionsManager.TelnetPort = int.Parse(TbTelnetPort.Text);
+            OptionsManager.SendTranslationsTo = TransToRadioButtons;
+            OptionsManager.AllowCommandsFrom = CommandsFromRadioButtons;
+            OptionsManager.SendTranslationsFrom = TransFromCheckBoxes;
+            OptionsManager.IgnoreOwnMessages = IgnoreOwnMessages; 
+            
+            OptionsManager.Save();
+            Close();
         }
 
         private void BtnSetDefault_Click(object sender, RoutedEventArgs e)
         {
-            OptionsController.SaveDefault();
-            this.Close();
+            OptionsManager.SetDefault();
+            LoadOptions();
+        }
+        
+        private void TbTelnetPort_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            var regex = new Regex("^[0-9]*$");
+            e.Handled = !regex.IsMatch(e.Text);
+        }
+
+        private void TbOwnUsername_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (((TextBox) sender).Text.Length > 0)
+            {
+                CbIgnoreOwnMessages.IsEnabled = true;
+                RbCommandsSelf.IsEnabled = true;
+            }
+            else
+            {
+                CbIgnoreOwnMessages.IsEnabled = false;
+                CbIgnoreOwnMessages.IsChecked = false;
+                RbCommandsSelf.IsEnabled = false;
+                
+                if (RbCommandsSelf.IsChecked != null && (bool) RbCommandsSelf.IsChecked)
+                    RbCommandsTeam.IsChecked = true;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using CsgoTranslator.Enums;
 using CsgoTranslator.Models;
 
 namespace CsgoTranslator.Controllers
