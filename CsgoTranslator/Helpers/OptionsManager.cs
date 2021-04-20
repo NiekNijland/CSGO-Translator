@@ -29,7 +29,7 @@ namespace CsgoTranslator.Helpers
             get => Properties.Settings.Default.TelnetPort;
             set => Properties.Settings.Default.TelnetPort = value;
         }
-        public static TelnetGrant SendTranslationsTo
+        public static ChatType SendTranslationsTo
         {
             get => Properties.Settings.Default.SendTranslationsTo;
             set => Properties.Settings.Default.SendTranslationsTo = value;
@@ -58,7 +58,7 @@ namespace CsgoTranslator.Helpers
             OwnUsername = "";
             IgnoreOwnMessages = false;
             TelnetPort = 2121;
-            SendTranslationsTo = TelnetGrant.TeamChat;
+            SendTranslationsTo = ChatType.Team;
             SendTranslationsFrom = TelnetGrant.AllChat;
             AllowCommandsFrom = TelnetGrant.TeamChat; 
             

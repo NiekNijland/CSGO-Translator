@@ -13,11 +13,11 @@ namespace CsgoTranslator.Models
 
         protected Command(string rawLog, ChatType chatType, string name, string message, string langParam = null) : base(rawLog)
         {
-            this.ChatType = chatType;
-            this.Name = name;
-            this.Message = message;
-            this.LangParam = langParam;
-            this.Executed = false;
+            ChatType = chatType;
+            Name = name;
+            Message = message;
+            LangParam = langParam;
+            Executed = false;
         }
 
 

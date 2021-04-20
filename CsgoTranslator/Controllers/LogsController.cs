@@ -14,21 +14,22 @@ namespace CsgoTranslator.Controllers
         public static List<Chat> Chats { get; set; }
         public static List<Command> Commands { get; set; }
 
-        /// <summary>
-        /// Loads the amount rows from the console.log file. stores the output in Chats & Commands
-        /// </summary>
-        /// <param name="amount"></param>
+        /**
+         * <summary>
+         *  Loads the amount rows from the console.log file. stores the output in Chats & Commands
+         * </summary>
+         * <param name="amount"></param>
+        */
         public static void LoadLogs(int amount)
         {
             var logs = new LinkedList<Log>();
-
             var lines = GetLastLines(amount);
 
-            if (lines != null && lines.Count() != 0)
+            if (lines != null && lines.Count != 0)
             {
                 var (rawStrings, chatTypes, names, rawMessage) = LineCleaner(lines);
 
-                for (var i = 0; i < rawStrings.Count(); i++)
+                for (var i = 0; i < rawStrings.Count; i++)
                 {
                     if (rawMessage[i][0] == '!')
                     {
@@ -41,15 +42,15 @@ namespace CsgoTranslator.Controllers
                     }
                 }
 
-                var addList = new List<Log>();
-
-                //if logs where found in the file.
+                /* if logs where found in the file. */
                 if(logs.Last != null)
                 {
+                    var addList = new List<Log>();
+                    
                     /*
                         loop backwards over the array with the discovered logs.
                         Check for each node if the node is identical to the last added node in the system.
-                        When the last added node was found, add all nodes that were looped over allready because they are new.
+                        When the last added node was found, add all nodes that were looped over already because they are new.
                     */
                     for (var node = logs.Last; node != null; node = node.Previous)
                     {
@@ -66,11 +67,11 @@ namespace CsgoTranslator.Controllers
                             break;
                         }
                     }
-                }
-
-                foreach(var log in addList)
-                {
-                    SaveLog(log);
+                    
+                    foreach(var log in addList)
+                    {
+                        SaveLog(log);
+                    }
                 }
             }
 
@@ -80,15 +81,47 @@ namespace CsgoTranslator.Controllers
                 switch (log)
                 {
                     case Chat chat:
+                        if (OptionsManager.IgnoreOwnMessages && chat.Name == OptionsManager.OwnUsername) return;
+
                         Chats.Insert(0, chat);
-                        TelnetHelper.SendChatTranslation(ChatType.Team, chat);
+                        
+                        /* Send translation in chat over telnet if options allow it. */                        
+                        switch (OptionsManager.SendTranslationsFrom)
+                        {
+                            case TelnetGrant.AllChat:
+                                if (chat.ChatType == ChatType.Team) return;
+                                break;
+                            case TelnetGrant.TeamChat:
+                                if (chat.ChatType == ChatType.All) return;
+                                break;
+                        }
+                        
+                        TelnetHelper.SendChatTranslation(OptionsManager.SendTranslationsTo, chat);
+                        
                         break;
                     case Command command:
+                        
+                        /* Check options is command is allowed */
+                        switch (OptionsManager.AllowCommandsFrom)
+                        {
+                            case TelnetGrant.Self:
+                                if (command.Name != OptionsManager.OwnUsername) return;
+                                break;
+                            case TelnetGrant.TeamChat:
+                                if (command.ChatType == ChatType.All) return;
+                                break;
+                            default:
+                                return;
+                        }
+                        
                         Commands.Insert(0, command);
                         break;
                 }
             }
-
+            
+            /*
+             * Compares 2 nodes based on value and if necessary, the 3 previous logs.
+             */
             static bool Compare(LinkedListNode<Log> lastAddedNode, LinkedListNode<Log> newNode)
             {
                 var lastAddedNodeRelative = lastAddedNode;
@@ -109,15 +142,12 @@ namespace CsgoTranslator.Controllers
             }
         }
 
-        /// <summary>
-        /// Helper function for LoadLogs
-        /// Gets the latest amount rows from the console.log file.
-        /// </summary>
-        /// <param name="amount"></param>
-        /// <returns>list with string of each line</returns>
+        /**
+         * Reads the last <param name="amount"></param> lines from the console.log file.
+         */
         private static List<string> GetLastLines(int amount)
         {
-            //check if file exists, if not return null so an error can be displayed
+            /* Return null if the file does not exist. */
             if (!File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log")) return null;
             
             var count = 0;
@@ -133,24 +163,30 @@ namespace CsgoTranslator.Controllers
                 fs.Read(buffer, 0, 1);
                 if (buffer[0] == '\n') count++;
 
-                fs.Seek(-1, SeekOrigin.Current); // fs.Read(...) advances the position, so we need to go back again
+                /* fs.Read(...) advances the position, so we need to go back again */
+                fs.Seek(-1, SeekOrigin.Current); 
             }
-            fs.Seek(1, SeekOrigin.Current); // go past the last '\n'
+            /* go past the last '\n' */
+            fs.Seek(1, SeekOrigin.Current);
 
             using var sr = new StreamReader(fs);
             string line;
             while ((line = sr.ReadLine()) != null)
+            {
                 consoleLines.Add(line);
+            }
 
             return consoleLines;
         }
 
-        /// <summary>
-        /// Helper function for LoadLogs
-        /// function that checks all console log lines for chat messages and cleans them up. then returns 3 lists (ChatTypes, names & messages)
-        /// </summary>
-        /// <param name="lines"></param>
-        /// <returns>tuple with chat-types names and messages for discovered chatlogs</returns>
+        /**
+         * <summary>
+         * Helper function for LoadLogs
+         * function that checks takes a list with console.log lines and attempts to find chat messages in them.
+         * </summary>
+         * <param name="lines">List of </param>
+         * <returns>A tuple with 4 lists of cleaned and validated data.</returns>
+         */
         private static (List<string> rawStrings, List<ChatType> chatTypes, List<string> names, List<string> messages) LineCleaner(IEnumerable<string> lines)
         {
             var returnRawStrings = new List<string>();
@@ -160,7 +196,7 @@ namespace CsgoTranslator.Controllers
 
             foreach (var l in lines)
             {
-                //filter the lines on chat message syntax
+                /* filter the lines on chat message syntax */
                 if (!l.Contains(" : ") || l.Contains("  : ") || l.Contains("!.") ||
                     l.Trim().StartsWith("Duplicate :          ")) continue;
                 var temp = l.Split(new string[] { " : " }, 2, StringSplitOptions.None);
@@ -169,11 +205,11 @@ namespace CsgoTranslator.Controllers
                 var namePart = temp[0].Trim();
                 var messagePart = temp[1].Trim();
 
-                //removal of *DEAD* chat prefix.
+                /* removal of *DEAD* chat prefix. */
                 if (namePart.StartsWith("*DEAD*"))
                     namePart = namePart.Substring(6).Trim();
 
-                //removal of team-chat prefix.
+                /* removal of team-chat prefix. */
                 if (namePart.StartsWith("(Counter-Terrorist)"))
                 {
                     namePart = namePart.Substring(19).Trim();
@@ -186,7 +222,7 @@ namespace CsgoTranslator.Controllers
                     chatType = ChatType.Team;
                 }
 
-                //removal of the team-chat location info.
+                /* removal of the team-chat location info. */
                 if(chatType == ChatType.Team)
                 {
                     var idx = namePart.LastIndexOf('@');
@@ -194,6 +230,9 @@ namespace CsgoTranslator.Controllers
                     if (idx != -1)
                         namePart = namePart.Substring(0, idx).Trim();
                 }
+
+                /* removing the ? after the username that is there for unknown reasons. */
+                namePart = namePart.Remove(namePart.Length - 1);
 
                 returnRawStrings.Add(l);
                 returnChatTypes.Add(chatType);

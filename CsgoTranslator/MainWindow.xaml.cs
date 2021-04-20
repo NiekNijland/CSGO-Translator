@@ -45,7 +45,7 @@ namespace CsgoTranslator
             ExecuteCommands();
         }
 
-        static private void ExecuteCommands()
+        private static void ExecuteCommands()
         {
             foreach (var command in LogsController.Commands.Where(command => !command.Executed))
             {

@@ -1,5 +1,7 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using System.Text;
+using CsgoTranslator.Helpers;
 
 namespace CsgoTranslator.MinimalisticTelnet
 {
@@ -9,9 +11,8 @@ namespace CsgoTranslator.MinimalisticTelnet
 
         private const int TimeOutMs = 100;
         private const string Hostname = "localhost";
-        private const int Port = 2121;
 
-        public bool Connected => _tcpSocket != null && _tcpSocket.Connected;
+        public bool Connected => _tcpSocket != null && _tcpSocket.Connected && TestConnection();
 
         public TelnetConnection()
         {
@@ -22,7 +23,7 @@ namespace CsgoTranslator.MinimalisticTelnet
         {
             try
             {
-                _tcpSocket = new TcpClient(Hostname, Port);
+                _tcpSocket = new TcpClient(Hostname, OptionsManager.TelnetPort);
                 return _tcpSocket.Connected;
             }
             catch
@@ -31,6 +32,18 @@ namespace CsgoTranslator.MinimalisticTelnet
             }
         }
 
+        private bool TestConnection()
+        {
+            using var tcpClient = new TcpClient();
+            try {
+                tcpClient.Connect(Hostname, OptionsManager.TelnetPort);
+                return true;
+            } 
+            catch (Exception)
+            {
+                return false;
+            }
+        }
         public void WriteLine(string cmd)
         {
             var utf8 = Encoding.UTF8;

@@ -30,3 +30,4 @@ C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\Cs
 C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\CsgoTranslator.pdb
 C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\OptionsWindow.g.cs
 C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\OptionsWindow.baml
+C:\Users\Niek Nijland\source\repos\CSGO-Translator\CsgoTranslator\obj\Release\CsgoTranslator_Content.g.cs

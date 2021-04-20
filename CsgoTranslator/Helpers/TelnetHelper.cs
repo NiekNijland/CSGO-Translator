@@ -29,8 +29,8 @@ namespace CsgoTranslator.Helpers
         {
             return chatType switch
             {
-                ChatType.All => ExecuteCsgoCommand($"say_team !. {message}"),
-                ChatType.Team => ExecuteCsgoCommand($"say !. {message}"),
+                ChatType.All => ExecuteCsgoCommand($"say !. {message}"),
+                ChatType.Team => ExecuteCsgoCommand($"say_team !. {message}"),
                 _ => false,
             };
         }

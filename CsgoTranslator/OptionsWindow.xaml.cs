@@ -14,18 +14,18 @@ namespace CsgoTranslator
     /// </summary>
     public partial class OptionsWindow 
     {
-        private TelnetGrant TransToRadioButtons
+        private ChatType TransToRadioButtons
         {
-            get => RbTransToAll.IsChecked != null && (bool) (RbTransToAll.IsChecked) ? TelnetGrant.AllChat : TelnetGrant.TeamChat;
+            get => RbTransToAll.IsChecked != null && (bool) (RbTransToAll.IsChecked) ? ChatType.All : ChatType.Team;
             set
             {
-                if (value == TelnetGrant.AllChat)
+                if (value == ChatType.Team)
                 {
-                    RbTransToAll.IsChecked = true;    
+                    RbTransToTeam.IsChecked = true;    
                 }
                 else
                 {
-                    RbTransToTeam.IsChecked = true;
+                    RbTransToAll.IsChecked = true;
                 }
             }
         }
@@ -101,12 +101,12 @@ namespace CsgoTranslator
         }
         private string OwnUsername
         {
-            get => TbOwnUsername.Text;
+            get => TbOwnUsername.Text.Trim();
             set
             {
                 TbOwnUsername.Text = value;
 
-                if (value.Length > 0)
+                if (!string.IsNullOrEmpty(value))
                 {
                     CbIgnoreOwnMessages.IsEnabled = true;
                     RbCommandsSelf.IsEnabled = true;
@@ -114,7 +114,11 @@ namespace CsgoTranslator
                 else
                 {
                     CbIgnoreOwnMessages.IsEnabled = false;
+                    CbIgnoreOwnMessages.IsChecked = false;
                     RbCommandsSelf.IsEnabled = false;
+                    
+                    if (RbCommandsSelf.IsChecked != null && (bool) RbCommandsSelf.IsChecked)
+                        RbCommandsTeam.IsChecked = true;
                 }
             }
         }
@@ -141,7 +145,7 @@ namespace CsgoTranslator
         {
             OptionsManager.InstallationPath = TbFolderPath.Text;
             OptionsManager.Language = TbLang.Text;
-            OptionsManager.OwnUsername = TbOwnUsername.Text;
+            OptionsManager.OwnUsername = OwnUsername;
             OptionsManager.TelnetPort = int.Parse(TbTelnetPort.Text);
             OptionsManager.SendTranslationsTo = TransToRadioButtons;
             OptionsManager.AllowCommandsFrom = CommandsFromRadioButtons;

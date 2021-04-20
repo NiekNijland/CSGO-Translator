@@ -51,7 +51,7 @@ namespace CsgoTranslator.Properties {
 
         public string OwnUsername { get; set; }
         public int TelnetPort { get; set; }
-        public TelnetGrant SendTranslationsTo { get; set; }
+        public ChatType SendTranslationsTo { get; set; }
         public TelnetGrant SendTranslationsFrom { get; set; }
         public TelnetGrant AllowCommandsFrom { get; set; }
         public bool IgnoreOwnMessages { get; set; }

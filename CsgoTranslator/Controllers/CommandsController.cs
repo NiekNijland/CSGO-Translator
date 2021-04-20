@@ -1,20 +1,23 @@
 ﻿using System;
 using CsgoTranslator.Enums;
+using CsgoTranslator.Helpers;
 using CsgoTranslator.Models;
 
 namespace CsgoTranslator.Controllers
 {
     public static class CommandsController
     {
-        /// <summary>
-        /// Helper function for LoadLogs
-        /// function checks if given message contains a valid command and will return the correct command or null.
-        /// </summary>
+        /**
+         * <summary>
+         * Helper function for LoadLogs
+         * function checks if given message contains a valid command and will return the correct command or null.
+         * </summary>
+         */
         public static Command BuildCommand(string rawString, ChatType chatType, string name, string rawMessage)
         {
             string message;
             ChatType exportChatType;
-
+            
             #region command validation
 
             if (rawMessage.StartsWith("!all"))
@@ -36,7 +39,7 @@ namespace CsgoTranslator.Controllers
 
             #region language param checking
 
-            //checking if there is a language param.
+            /* checking if there is a language param. */
             var temp = message.Split(new char[] { ' ' }, 2);
             var possLang = temp[0].Trim();
 

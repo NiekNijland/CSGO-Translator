@@ -8,8 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("minimalistictelnet/minimalistictelnet.sln")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("minimalistictelnet/minimalistictelnet/bin/release/minimalistictelnet.exe")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("minimalistictelnet/minimalistictelnet/bin/release/minimalistictelnet.pdb")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute(".gitignore")]
 
 

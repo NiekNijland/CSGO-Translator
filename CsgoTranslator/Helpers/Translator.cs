@@ -5,20 +5,22 @@ using System.Web;
 
 namespace CsgoTranslator.Helpers
 {
-    /// <summary>
-    /// Translates text using Google's online language tools.
-    /// </summary>
+    /**
+     * <summary>
+     * Translates text using Google's online language tools.
+     * </summary>
+     */
     public static class Translator
     {
         public static string Translate(string sourceText, string lang = null)
         {
-            //Downloading translation
+            /* Downloading translation */
             lang ??= Properties.Settings.Default.Lang;
 
             var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl={lang}&dt=t&q={HttpUtility.UrlEncode(sourceText)}";
             var outputFile = Path.GetTempFileName();
 
-            //sometimes will throw an exception when too many requests are made
+            /* sometimes will throw an exception when too many requests are made */
             try
             {
                 using (var wc = new WebClient())
