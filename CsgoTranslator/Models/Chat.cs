@@ -8,7 +8,7 @@ namespace CsgoTranslator.Models
         public ChatType ChatType { get; }
         public string Name { get; }
         public string Translation => _translation ??= Translate();
-        private string Message { get; }
+        public string Message { get; }
 
         private string _translation;
         

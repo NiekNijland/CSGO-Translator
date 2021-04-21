@@ -9,9 +9,11 @@ using CsgoTranslator.MinimalisticTelnet;
 
 namespace CsgoTranslator
 {
-    /// <summary>
-    /// Interaction logic for OptionsWindow.xaml
-    /// </summary>
+    /**
+     * <summary>
+     *Interaction logic for OptionsWindow.xaml
+     * </summary>
+     */
     public partial class OptionsWindow 
     {
         private ChatType TransToRadioButtons

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
@@ -12,49 +13,60 @@ using CsgoTranslator.Models;
 
 namespace CsgoTranslator
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    /**
+     * <summary>
+     * Interaction logic for MainWindow.xaml
+     * </summary>
+     */
     public partial class MainWindow : Window
     {
         private readonly DispatcherTimer _checkTimer = new DispatcherTimer();
+
         public MainWindow()
         {
+            InitializeComponent();
+
             LogsController.Logs = new LinkedList<Log>();
             LogsController.Chats = new List<Chat>();
             LogsController.Commands = new List<Command>();
 
-            InitializeComponent();
+            Loaded += LoadWindow;
+        }
+
+        private void LoadWindow(object sender, RoutedEventArgs e)
+        {
+            ChatView.ItemsSource = LogsController.Chats;
+
             _checkTimer.Interval = TimeSpan.FromSeconds(3);
             _checkTimer.Tick += TimerTick;
-            _checkTimer.Tick += UpdateTelnetConnectionStatus;
             _checkTimer.Start();
 
-            LogsController.Chats = new List<Chat>();
-            ChatView.ItemsSource = LogsController.Chats;
             OptionsManager.ValidateSettings();
-
-            TelnetHelper.Connect();
-            UpdateTelnetConnectionStatus(null, null);
         }
 
-        private void TimerTick(object sender, EventArgs e)
+
+        private async void TimerTick(object sender, EventArgs e)
         {
-            LogsController.LoadLogs(30);
+
+            await LogsController.LoadLogsAsync(30);
             ChatView.Items.Refresh();
-            ExecuteCommands();
+
+            /* Do not await because these functions have no return */
+            UpdateTelnetAsync();
+            ExecuteCommandsAsync();
         }
 
-        private static void ExecuteCommands()
+        private static async Task ExecuteCommandsAsync()
         {
+            /* await each task because otherwise the order of responses might be incorrect */
             foreach (var command in LogsController.Commands.Where(command => !command.Executed))
             {
-                command.Execute();
+                await Task.Run(() => command.Execute());
                 command.Executed = true;
             }
         }
 
-        private void UpdateTelnetConnectionStatus(object sender, EventArgs e)
+        private async Task UpdateTelnetAsync()
         {
             if (TelnetHelper.Connected)
             {
@@ -63,7 +75,7 @@ namespace CsgoTranslator
             else if(OptionsManager.SendTranslationsFrom != TelnetGrant.Undefined)
             {
                 lbl_telnet_status.Content = "Disconnected";
-                TelnetHelper.Connect();
+                await Task.Run(() => TelnetHelper.Connect());
             }
             else
             {
@@ -73,10 +85,8 @@ namespace CsgoTranslator
 
         private void BtnOptions_Click(object sender, RoutedEventArgs e)
         {
-            _checkTimer.Stop();
             new OptionsWindow().ShowDialog();
             LogsController.Chats.Clear();
-            _checkTimer.Start();
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using CsgoTranslator.Enums;
 using CsgoTranslator.Helpers;
 using CsgoTranslator.Models;
@@ -13,6 +14,11 @@ namespace CsgoTranslator.Controllers
         public static LinkedList<Log> Logs { get; set; }
         public static List<Chat> Chats { get; set; }
         public static List<Command> Commands { get; set; }
+
+        public static async Task LoadLogsAsync(int amount)
+        {
+            await Task.Run(() => LoadLogs(amount));
+        }
 
         /**
          * <summary>
@@ -84,7 +90,9 @@ namespace CsgoTranslator.Controllers
                         if (OptionsManager.IgnoreOwnMessages && chat.Name == OptionsManager.OwnUsername) return;
 
                         Chats.Insert(0, chat);
-                        
+
+                        if (chat.Translation == chat.Message) return;
+
                         /* Send translation in chat over telnet if options allow it. */                        
                         switch (OptionsManager.SendTranslationsFrom)
                         {
