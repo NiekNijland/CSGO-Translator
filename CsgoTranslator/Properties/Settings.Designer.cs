@@ -8,13 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using CsgoTranslator.Enums;
-
 namespace CsgoTranslator.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -48,12 +46,77 @@ namespace CsgoTranslator.Properties {
                 this["Lang"] = value;
             }
         }
-
-        public string OwnUsername { get; set; }
-        public int TelnetPort { get; set; }
-        public ChatType SendTranslationsTo { get; set; }
-        public TelnetGrant SendTranslationsFrom { get; set; }
-        public TelnetGrant AllowCommandsFrom { get; set; }
-        public bool IgnoreOwnMessages { get; set; }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OwnUsername {
+            get {
+                return ((string)(this["OwnUsername"]));
+            }
+            set {
+                this["OwnUsername"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int TelnetPort {
+            get {
+                return ((int)(this["TelnetPort"]));
+            }
+            set {
+                this["TelnetPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SendTranslationsTo {
+            get {
+                return ((int)(this["SendTranslationsTo"]));
+            }
+            set {
+                this["SendTranslationsTo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SendTranslationsFrom {
+            get {
+                return ((int)(this["SendTranslationsFrom"]));
+            }
+            set {
+                this["SendTranslationsFrom"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AllowCommandsFrom {
+            get {
+                return ((int)(this["AllowCommandsFrom"]));
+            }
+            set {
+                this["AllowCommandsFrom"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IgnoreOwnMessages {
+            get {
+                return ((bool)(this["IgnoreOwnMessages"]));
+            }
+            set {
+                this["IgnoreOwnMessages"] = value;
+            }
+        }
     }
 }

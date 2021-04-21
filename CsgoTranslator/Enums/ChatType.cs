@@ -2,8 +2,8 @@
 {
     public enum ChatType
     {
-        Undefined,
-        All,
-        Team,
+        Undefined = 0,
+        All = 1,
+        Team = 2,
     }
 }

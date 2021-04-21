@@ -31,18 +31,18 @@ namespace CsgoTranslator.Helpers
         }
         public static ChatType SendTranslationsTo
         {
-            get => Properties.Settings.Default.SendTranslationsTo;
-            set => Properties.Settings.Default.SendTranslationsTo = value;
+            get => (ChatType) Properties.Settings.Default.SendTranslationsTo;
+            set => Properties.Settings.Default.SendTranslationsTo = (int) value;
         } 
         public static TelnetGrant SendTranslationsFrom
         {
-            get => Properties.Settings.Default.SendTranslationsFrom;
-            set => Properties.Settings.Default.SendTranslationsFrom = value;
+            get => (TelnetGrant) Properties.Settings.Default.SendTranslationsFrom;
+            set => Properties.Settings.Default.SendTranslationsFrom = (int) value;
         } 
         public static TelnetGrant AllowCommandsFrom 
         {
-            get => Properties.Settings.Default.AllowCommandsFrom;
-            set => Properties.Settings.Default.AllowCommandsFrom = value;
+            get => (TelnetGrant) Properties.Settings.Default.AllowCommandsFrom;
+            set => Properties.Settings.Default.AllowCommandsFrom = (int) value;
         } 
 
         public static void ValidateSettings()
