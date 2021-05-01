@@ -89,6 +89,7 @@
     <Compile Include="Controllers\CommandsController.cs" />
     <Compile Include="Enums\ChatType.cs" />
     <Compile Include="Enums\TelnetGrant.cs" />
+    <Compile Include="Exceptions\GoogleTranslateTimeoutException.cs" />
     <Compile Include="Helpers\OptionsManager.cs" />
     <Compile Include="Helpers\TelnetHelper.cs" />
     <Compile Include="MinimalisticTelnet\Options.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Models\Command.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\TransCommand.cs" />
+    <Compile Include="Models\Translation.cs" />
     <Compile Include="OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>

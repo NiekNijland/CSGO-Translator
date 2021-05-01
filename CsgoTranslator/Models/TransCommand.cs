@@ -6,7 +6,7 @@ namespace CsgoTranslator.Models
     public class TransCommand : Command
     {
         private ChatType ExportChatType { get; }
-        private string Translation { get; set; }
+        private Translation Translation { get; set; }
 
         public TransCommand(string rawString, ChatType exportChatType, ChatType chatType, string name, string message, string commandParams = null) : base(rawString, chatType, name, message, commandParams) 
         {
@@ -15,10 +15,10 @@ namespace CsgoTranslator.Models
 
         public override void Execute()
         {
-            Translation = Translator.Translate(Message, LangParam).Trim();
+            Translation = Translator.GetTranslation(Message, LangParam);
             
-            if(Translation != Message && Translation != "")
-                TelnetHelper.SendInChat(ExportChatType, Translation);
+            if(Translation.Message != Message && Translation.Message != "")
+                TelnetHelper.SendInChat(ExportChatType, Translation.Message);
 
             Executed = true;
         }

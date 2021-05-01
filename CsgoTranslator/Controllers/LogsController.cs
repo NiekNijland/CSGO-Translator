@@ -91,7 +91,7 @@ namespace CsgoTranslator.Controllers
 
                         Chats.Insert(0, chat);
 
-                        if (chat.Translation == chat.Message) return;
+                        if (chat.Translation.Message == chat.Message) return;
 
                         /* Send translation in chat over telnet if options allow it. */                        
                         switch (OptionsManager.SendTranslationsFrom)
@@ -204,10 +204,11 @@ namespace CsgoTranslator.Controllers
 
             foreach (var l in lines)
             {
-                /* filter the lines on chat message syntax */
-                if (!l.Contains(" : ") || l.Contains("  : ") || l.Contains("!.") ||
-                    l.Trim().StartsWith("Duplicate :          ")) continue;
-                var temp = l.Split(new string[] { " : " }, 2, StringSplitOptions.None);
+                /* filter out a few edge cases */
+                if (!l.Contains(" : ") || l.Contains("  : ") || l.Contains("!.") || l.Trim().StartsWith("Duplicate :          "))
+                    continue;
+                
+                var temp = l.Split(new [] { " : " }, 2, StringSplitOptions.None);
 
                 var chatType = ChatType.All;
                 var namePart = temp[0].Trim();

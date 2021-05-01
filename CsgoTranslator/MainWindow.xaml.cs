@@ -70,16 +70,16 @@ namespace CsgoTranslator
         {
             if (TelnetHelper.Connected)
             {
-                lbl_telnet_status.Content = "Connected";
+                LblTelnetStatus.Content = "Connected";
             }
             else if(OptionsManager.SendTranslationsFrom != TelnetGrant.Undefined)
             {
-                lbl_telnet_status.Content = "Disconnected";
+                LblTelnetStatus.Content = "Disconnected";
                 await Task.Run(() => TelnetHelper.Connect());
             }
             else
             {
-                lbl_telnet_status.Content = "Disabled";
+                LblTelnetStatus.Content = "Disabled";
             }
         }
 

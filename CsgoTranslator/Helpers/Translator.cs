@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Web;
+using CsgoTranslator.Exceptions;
+using CsgoTranslator.Models;
 
 namespace CsgoTranslator.Helpers
 {
@@ -12,15 +15,38 @@ namespace CsgoTranslator.Helpers
      */
     public static class Translator
     {
-        public static string Translate(string sourceText, string lang = null)
+        
+        private static readonly Dictionary<string, Translation> CachedTranslations = new Dictionary<string, Translation>();
+
+        public static Translation GetTranslation(string sourceText, string lang = null)
         {
-            /* Downloading translation */
             lang ??= Properties.Settings.Default.Lang;
 
+            if (CachedTranslations.ContainsKey(sourceText + lang))
+                return CachedTranslations[sourceText + lang];
+
+            Translation translation;
+            try
+            {
+                translation = Translate(sourceText, lang);
+            }
+            catch (GoogleTranslateTimeoutException)
+            {
+                translation = new Translation(lang);    
+                /* TODO: Fire some sort of event to MainWindow so we can display a proper error message */
+            }
+
+            CachedTranslations[sourceText + lang] = translation;
+            
+            return translation;
+        }
+        
+        private static Translation Translate(string sourceText, string lang)
+        {
             var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl={lang}&dt=t&q={HttpUtility.UrlEncode(sourceText)}";
             var outputFile = Path.GetTempFileName();
 
-            /* sometimes will throw an exception when too many requests are made */
+            /* This method of getting translations is rate limited at 100 / hour, so big chance it will throw a 429 */
             try
             {
                 using (var wc = new WebClient())
@@ -28,12 +54,13 @@ namespace CsgoTranslator.Helpers
                     wc.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
                     wc.DownloadFile(url, outputFile);
                 }
-                var text = File.ReadAllText(outputFile).Substring(4).Split('"')[0];
-                return text;
+                var message = File.ReadAllText(outputFile).Substring(4).Split('"')[0];
+                return new Translation(lang, message);
             }
             catch(Exception)
             {
-                return "";
+                /* TODO: add exception validation and maybe more catch hooks */
+                throw new GoogleTranslateTimeoutException(); 
             }
         }
     }

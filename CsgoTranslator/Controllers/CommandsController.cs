@@ -43,10 +43,9 @@ namespace CsgoTranslator.Controllers
             var temp = message.Split(new char[] { ' ' }, 2);
             var possLang = temp[0].Trim();
 
-            if (possLang[0] != '-' || possLang.Length != 3)
-                return message.Length > 0
-                    ? new TransCommand(rawString, exportChatType, chatType, name, message)
-                    : null;
+            if (possLang[0] != '-')
+                return message.Length > 0 ? new TransCommand(rawString, exportChatType, chatType, name, message) : null;
+
             
             var lang = possLang.Substring(1);
             message = temp[1].Trim();

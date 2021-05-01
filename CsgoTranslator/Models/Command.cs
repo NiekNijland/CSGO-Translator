@@ -1,5 +1,4 @@
-﻿using System;
-using CsgoTranslator.Enums;
+﻿using CsgoTranslator.Enums;
 
 namespace CsgoTranslator.Models
 {

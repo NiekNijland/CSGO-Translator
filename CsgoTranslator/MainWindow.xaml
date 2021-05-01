@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CsgoTranslator"
         mc:Ignorable="d"
         Title="CSGO Translator" Height="484.025" Width="550" ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="149*"/>
             <ColumnDefinition Width="123*"/>
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <ListView x:Name="ChatView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="357" Width="544" Grid.ColumnSpan="2">
             <ListView.View>
@@ -20,17 +20,18 @@
                         </Style>
                     </GridView.ColumnHeaderContainerStyle>
                     <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Header="Translation" Width="330" DisplayMemberBinding="{Binding Translation}" />
+                    <GridViewColumn Header="Translation" Width="330" DisplayMemberBinding="{Binding Translation.Message}" />
                 </GridView>
             </ListView.View>
         </ListView>
-        <TextBlock FontSize="22" Margin="10,404,144,-1">           
-            <Hyperlink NavigateUri="https://steamcommunity.com/profiles/76561198171831059" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="mad"/><InlineUIContainer>
-                    
-                </InlineUIContainer><Run Text="e by n00k"/></Hyperlink>
+        <TextBlock Grid.Column="0" FontSize="22" Margin="10,404,144,-1">           
+            <Hyperlink NavigateUri="https://steamcommunity.com/profiles/76561198171831059" RequestNavigate="Hyperlink_RequestNavigate">
+                <Run Text="made by n00k"/>
+                <InlineUIContainer />
+            </Hyperlink>
         </TextBlock>
         <Button Content="Options" Margin="131,398,10,10" Click="BtnOptions_Click" Grid.Column="1" RenderTransformOrigin="0.505,0.514"/>
-        <Label Content="Telnet:" HorizontalAlignment="Left" Margin="10,361,0,0" VerticalAlignment="Top" FontSize="20"/>
-        <Label x:Name="lbl_telnet_status" Content="" HorizontalAlignment="Left" Margin="82,362,0,0" VerticalAlignment="Top" FontSize="20"/>
+        <Label Grid.Column="0" Content="Telnet:" HorizontalAlignment="Left" Margin="10,361,0,0" VerticalAlignment="Top" FontSize="20"/>
+        <Label x:Name="LblTelnetStatus" Grid.Column="0" Content="" HorizontalAlignment="Left" Margin="77,362,0,0" VerticalAlignment="Top" FontSize="20"/>
     </Grid>
 </Window>

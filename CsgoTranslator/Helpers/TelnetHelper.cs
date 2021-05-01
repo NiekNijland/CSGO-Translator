@@ -37,7 +37,7 @@ namespace CsgoTranslator.Helpers
 
         public static bool SendChatTranslation(ChatType chatType, Chat chat)
         {
-            return SendInChat(chatType, $"{chat.Name} : {chat.Translation}");
+            return SendInChat(chatType, $"{chat.Name} : {chat.Translation.Message}");
         }
     }
 }

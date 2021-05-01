@@ -7,10 +7,10 @@ namespace CsgoTranslator.Models
     {
         public ChatType ChatType { get; }
         public string Name { get; }
-        public string Translation => _translation ??= Translate();
+        public Translation Translation => _translation ??= Translate();
         public string Message { get; }
 
-        private string _translation;
+        private Translation _translation;
         
         public Chat(string rawString, ChatType chatType, string name, string message) : base(rawString)
         {
@@ -19,9 +19,9 @@ namespace CsgoTranslator.Models
             Message = message;
         }
 
-        private string Translate()
+        private Translation Translate()
         {
-            return Translator.Translate(Message);
+            return Translator.GetTranslation(Message);
         }
     }
 }
