@@ -1,38 +1,69 @@
 # CSGO-Translator
-Simple C# CSGO chat translator
+Easy to use, single-file CS:GO chat translation tool. 
 
-Ever wondered what your foreign language speaking teammates where trying to tell you?
+You probably know the feeling of not being able communicate in a match because everyone speaks a different language.
+Well, gone are those days. With this tool you can read translations of all foreign language messages, and even respond to them in their language. All while staying in the game.
 
-CSGO-Translator is a C# .NET WPF based tool that will automatically detect new chat messages, and translate them to your preferred language using Google Translate.
+CSGO-Translator will read the console output, detect chat messages, and then translate them with Google Translate. These translations can then be sent back to the in-game chat using Telnet.
 
-It works by reading the console logfile and analysing it for new messages every few seconds.
+You can also send a command to CSGO-Translator from the in-game chat. Which allows you to request a translation for some text in any language. This translation will then be sent in the in-game chat using Telnet.
 
-100% safe to use on official servers!
+All of this is accomplished using official CS:GO launch options. So this should be safe to use on official servers.
 
-EXAMPLE OF TRANSLATION:
-![](img/demo.PNG)
+## How to use
 
-OPTIONS AVAILABLE:
-![](img/demo2.PNG)
+1. Download the [latest release](https://github.com/NiekNijland/CSGO-Translator/releases) (or build it yourself)
+2. Set CS:GO launch options: `-condebug` & `-netconport 2121` ([how do I do this?](https://support.steampowered.com/kb_article.php?ref=1040-JWMT-2947)) 
+3. start CS:GO & CSGO-Translator
+4. (Optional) Change the options in CSGO-Translator to your liking. ([List of language codes](https://cloud.google.com/translate/docs/languages))
+5. Read translations & send commands in the in-game chat!
 
-SETUP:
-1. Download the lastest release (or build it yourself)
-2. Start up a game of CSGO
-3. Enter the console command: con_logfile "console.log" (or add it to your autoexec.cfg)
-4. run CSGO-Translator.exe
-5. (Optionally) Change your "Counter-Strike Global Offensive" folder path in the options menu. (default is default path)
-6. (Optionally) Change your language in the options menu by (2-char abbreviation. Example: fr,de,en,ru,es) (Default en)
-6. Move the window to your second monitor (or just alt + tab)
-7. See live translations of your incoming chat messages
+## Features & Examples
 
-FEATURES:
-1. Extremely simple setup, you only need to download 1 file and execute 1 command (or add it to your autoexec.cfg)
-2. Lots of languages supported (All that are available in Google Translate)
-3. 100% safe to use, all it does is read 1 file in the game directory.
-4. Will work with all csgo install locations.
-5. Automatically checks for new chats, no need to refresh or anything.
+### Translations in in-game chat
+![](img/translation-to-chat.png)<br /><br />
+By default all messages from the all-chat which are not in your preferred language (set in the options), will be sent to your team-chat.
+You can change this in the options menu.
 
-CURRENT LIMITATIONS:
-1. Might get a timeout from Google Translate under extreme use.
-2. Won't display new message when an identical message has been sent recently (to avoid the Google Translate timeout).
-3. Won't display chat messages on certain community servers because of different chat structures.
+### Commands from in-game chat
+![](img/command.png)<br /><br />
+By default commands are allowed from the team-chat. You can change this in the options menu.<br /><br />
+Command structure:<br />
+```
+!team/all (-languagecode) MESSAGE
+```
+
+Example commands:<br />
+```
+!team what are you doing?
+```
+```
+!team -fr вау, ты действительно хорош 
+```
+```
+!all -ru wat is jouw favoriete fruit?
+```
+```
+!all -zh-TW I am peeking middle
+```
+If no `-languagecode` is given, it will default to the language code that is set in the options menu.<br />
+[You can find the full list of supported language codes here](https://cloud.google.com/translate/docs/languages)
+
+### Translations
+![](img/translations-in-app.png)<br /><br />
+
+
+### Options
+![](img/options.png)<br /><br />
+By selecting __Ignore own messages__ your chat messages (not commands) will be ignored by the translator. 
+
+### Other features
+* Very simple to use
+* Lots of languages supported ([Full list of language codes](https://cloud.google.com/translate/docs/languages))
+* Translations are cached, so the same translation is used for identical messages.
+* Will work with all CS:GO install locations.
+* Everything can be done from the game, no need to Alt + Tab.
+
+### Current limitations
+* The current method of using Google Translate is rate-limited at 100 requests / hour.
+* Can't detect messages on certain community servers because of different chat structures.

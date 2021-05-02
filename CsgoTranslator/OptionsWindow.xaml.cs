@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using CsgoTranslator.Enums;
 using CsgoTranslator.Helpers;
 using CsgoTranslator.MinimalisticTelnet;
@@ -186,6 +188,12 @@ namespace CsgoTranslator
                 if (RbCommandsSelf.IsChecked != null && (bool) RbCommandsSelf.IsChecked)
                     RbCommandsTeam.IsChecked = true;
             }
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

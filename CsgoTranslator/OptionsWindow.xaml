@@ -10,13 +10,18 @@
         <Label Content="Install location:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,11,0,0"/>
         <TextBox x:Name="TbFolderPath" HorizontalAlignment="Left" Height="23" Margin="104,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
 
-        <Label Content="Language:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,46,0,0"/>
-        <TextBox x:Name="TbLang" HorizontalAlignment="Left" Height="23" Margin="104,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
-
+        <Label Content="Language code:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,46,0,0"/>
+        <TextBox x:Name="TbLang" HorizontalAlignment="Left" Height="23" Margin="104,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="198"/>
+        <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="310,53,0,0" Height="22">           
+            <Hyperlink NavigateUri="https://cloud.google.com/translate/docs/languages" RequestNavigate="Hyperlink_RequestNavigate">
+                <Run Text="View list of language codes"/>
+                <InlineUIContainer />
+            </Hyperlink>
+        </TextBlock>
         <Label Content="Own username:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,81,0,0"/>
         <TextBox x:Name="TbOwnUsername" TextChanged="TbOwnUsername_TextChanged" HorizontalAlignment="Left" Height="23" Margin="104,85,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542"/>
         <Label Content="Required for ignoring own messages and allowing commands from self" HorizontalAlignment="Left" Margin="102,102,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="10"/>
-        
+
         <Label Content="Ignore own messages:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,132,0,0"/>
         <CheckBox x:Name="CbIgnoreOwnMessages" HorizontalAlignment="Left" Margin="143,138,0,0" VerticalAlignment="Top"/>
 
