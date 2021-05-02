@@ -39,6 +39,9 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
@@ -83,11 +86,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="OptionsController.cs" />
+    <Compile Include="Controllers\CommandsController.cs" />
+    <Compile Include="Enums\ChatType.cs" />
+    <Compile Include="Enums\TelnetGrant.cs" />
+    <Compile Include="EventArgs\TranslatorExceptionEventArgs.cs" />
+    <Compile Include="Exceptions\GoogleTranslateTimeoutException.cs" />
+    <Compile Include="Exceptions\LogfileNotFoundException.cs" />
+    <Compile Include="Exceptions\NoInternetException.cs" />
+    <Compile Include="Exceptions\TranslatorException.cs" />
+    <Compile Include="Helpers\OptionsManager.cs" />
+    <Compile Include="Helpers\TelnetHelper.cs" />
+    <Compile Include="MinimalisticTelnet\Options.cs" />
+    <Compile Include="MinimalisticTelnet\TelnetConnection.cs" />
+    <Compile Include="MinimalisticTelnet\Verbs.cs" />
+    <Compile Include="Models\Command.cs" />
+    <Compile Include="Models\Log.cs" />
+    <Compile Include="Models\TransCommand.cs" />
+    <Compile Include="Models\Translation.cs" />
     <Compile Include="OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Translator.cs" />
+    <Compile Include="Helpers\Translator.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -96,8 +115,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Log.cs" />
-    <Compile Include="LogsController.cs" />
+    <Compile Include="Models\Chat.cs" />
+    <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -134,6 +153,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
