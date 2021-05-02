@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Web;
+using CsgoTranslator.EventArgs;
 using CsgoTranslator.Exceptions;
 using CsgoTranslator.Models;
 
@@ -15,13 +17,12 @@ namespace CsgoTranslator.Helpers
      */
     public static class Translator
     {
-        
         private static readonly Dictionary<string, Translation> CachedTranslations = new Dictionary<string, Translation>();
 
         public static Translation GetTranslation(string sourceText, string lang = null)
         {
             lang ??= Properties.Settings.Default.Lang;
-
+            
             if (CachedTranslations.ContainsKey(sourceText + lang))
                 return CachedTranslations[sourceText + lang];
 
@@ -29,11 +30,13 @@ namespace CsgoTranslator.Helpers
             try
             {
                 translation = Translate(sourceText, lang);
+                MainWindow.Succeeded(null, new TranslatorExceptionEventArgs { Exception = new GoogleTranslateTimeoutException() });
+                MainWindow.Succeeded(null, new TranslatorExceptionEventArgs { Exception = new NoInternetException() });
             }
-            catch (GoogleTranslateTimeoutException)
+            catch (TranslatorException e)
             {
                 translation = new Translation(lang);    
-                /* TODO: Fire some sort of event to MainWindow so we can display a proper error message */
+                MainWindow.ErrorEncountered(null, new TranslatorExceptionEventArgs { Exception = e });
             }
 
             CachedTranslations[sourceText + lang] = translation;
@@ -57,10 +60,15 @@ namespace CsgoTranslator.Helpers
                 var message = File.ReadAllText(outputFile).Substring(4).Split('"')[0];
                 return new Translation(lang, message);
             }
-            catch(Exception)
+            catch(WebException e)
             {
-                /* TODO: add exception validation and maybe more catch hooks */
-                throw new GoogleTranslateTimeoutException(); 
+                if(e.Message.StartsWith("The remote name could not be resolved: "))
+                    throw new NoInternetException();
+                
+                if(e.Message == "The remote server returned an error: (429) Too Many Requests.")
+                    throw new GoogleTranslateTimeoutException();
+
+                throw;
             }
         }
     }

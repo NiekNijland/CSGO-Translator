@@ -1,6 +1,7 @@
-﻿using System;
-
-namespace CsgoTranslator.Exceptions
+﻿namespace CsgoTranslator.Exceptions
 {
-    public class GoogleTranslateTimeoutException : Exception { }
+    public class GoogleTranslateTimeoutException : TranslatorException
+    {
+        public GoogleTranslateTimeoutException() : base("Google translate timeout") { }
+    }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using CsgoTranslator.Enums;
+using CsgoTranslator.EventArgs;
+using CsgoTranslator.Exceptions;
 using CsgoTranslator.Helpers;
 using CsgoTranslator.Models;
 
@@ -26,12 +27,23 @@ namespace CsgoTranslator.Controllers
          * </summary>
          * <param name="amount"></param>
         */
-        public static void LoadLogs(int amount)
+        private static void LoadLogs(int amount)
         {
             var logs = new LinkedList<Log>();
-            var lines = GetLastLines(amount);
 
-            if (lines != null && lines.Count != 0)
+            List<string> lines;
+            try
+            {
+                lines = GetLastLines(amount);
+                MainWindow.Succeeded(null, new TranslatorExceptionEventArgs { Exception = new LogfileNotFoundException() });
+            }
+            catch (TranslatorException e)
+            {
+                MainWindow.ErrorEncountered(null, new TranslatorExceptionEventArgs { Exception = e });
+                return;
+            }
+
+            if (lines.Count != 0)
             {
                 var (rawStrings, chatTypes, names, rawMessage) = LineCleaner(lines);
 
@@ -91,7 +103,7 @@ namespace CsgoTranslator.Controllers
 
                         Chats.Insert(0, chat);
 
-                        if (chat.Translation.Message == chat.Message) return;
+                        if (chat.Translation.Message == chat.Message || chat.Translation.Message == "---") return;
 
                         /* Send translation in chat over telnet if options allow it. */                        
                         switch (OptionsManager.SendTranslationsFrom)
@@ -156,7 +168,8 @@ namespace CsgoTranslator.Controllers
         private static List<string> GetLastLines(int amount)
         {
             /* Return null if the file does not exist. */
-            if (!File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log")) return null;
+            if (!File.Exists($@"{Properties.Settings.Default.Path}\csgo\console.log"))
+                throw new LogfileNotFoundException();
             
             var count = 0;
             var buffer = new byte[1];

@@ -33,5 +33,6 @@
         <Button Content="Options" Margin="131,398,10,10" Click="BtnOptions_Click" Grid.Column="1" RenderTransformOrigin="0.505,0.514"/>
         <Label Grid.Column="0" Content="Telnet:" HorizontalAlignment="Left" Margin="10,361,0,0" VerticalAlignment="Top" FontSize="20"/>
         <Label x:Name="LblTelnetStatus" Grid.Column="0" Content="" HorizontalAlignment="Left" Margin="77,362,0,0" VerticalAlignment="Top" FontSize="20"/>
+        <Label x:Name="LblError" Grid.Column="1" HorizontalAlignment="Left" Margin="0,361,0,0" VerticalAlignment="Top" FontSize="20" Content="" Foreground="#FFB03131"/>
     </Grid>
 </Window>

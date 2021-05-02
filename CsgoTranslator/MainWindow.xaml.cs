@@ -8,6 +8,8 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using CsgoTranslator.Controllers;
 using CsgoTranslator.Enums;
+using CsgoTranslator.EventArgs;
+using CsgoTranslator.Exceptions;
 using CsgoTranslator.Helpers;
 using CsgoTranslator.Models;
 
@@ -18,19 +20,38 @@ namespace CsgoTranslator
      * Interaction logic for MainWindow.xaml
      * </summary>
      */
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private readonly DispatcherTimer _checkTimer = new DispatcherTimer();
+        
+        public static EventHandler<TranslatorExceptionEventArgs> ErrorEncountered;
+        public static EventHandler<TranslatorExceptionEventArgs> Succeeded;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            ErrorEncountered += OnErrorEncountered;
+            Succeeded += OnSucceeded;
 
             LogsController.Logs = new LinkedList<Log>();
             LogsController.Chats = new List<Chat>();
             LogsController.Commands = new List<Command>();
 
             Loaded += LoadWindow;
+        }
+
+        private void OnErrorEncountered(object sender, TranslatorExceptionEventArgs args)
+        {
+           Dispatcher.Invoke(() => { LblError.Content = args.Exception.Message; }); 
+        }
+        
+        private void OnSucceeded(object sender, TranslatorExceptionEventArgs e)
+        { 
+            Dispatcher.Invoke(() => {
+                if ((string) LblError.Content == e.Exception.Message)
+                    LblError.Content = "";
+            });
         }
 
         private void LoadWindow(object sender, RoutedEventArgs e)
@@ -44,10 +65,8 @@ namespace CsgoTranslator
             OptionsManager.ValidateSettings();
         }
 
-
-        private async void TimerTick(object sender, EventArgs e)
+        private async void TimerTick(object sender, System.EventArgs e)
         {
-
             await LogsController.LoadLogsAsync(30);
             ChatView.Items.Refresh();
 
