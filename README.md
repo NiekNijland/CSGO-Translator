@@ -1,7 +1,7 @@
 # CSGO-Translator
 Easy to use, single-file CS:GO chat translation tool. 
 
-You probably know the feeling of not being able communicate in a match because everyone speaks a different language.
+You probably know the feeling of not being able to communicate in a match because everyone speaks a different language.
 Well, gone are those days. With this tool you can read translations of all foreign language messages, and even respond to them in their language. All while staying in the game.
 
 CSGO-Translator will read the console output, detect chat messages, and then translate them with Google Translate. These translations can then be sent back to the in-game chat using Telnet.
